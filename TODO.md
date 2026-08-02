@@ -1,0 +1,56 @@
+# 开发计划（TODO.md）
+
+> AI 记忆便签：新对话开始先读本文件，了解已完成与下一步。每次对话结束前必须刷新本文件。
+
+---
+
+## 1. 已完成（v1.2）
+
+- [x] F1 文件夹路径输入 / F2 包含隐藏文件 / F3 递归遍历
+- [x] F4 输出 Excel（v2.0 起改为可选导出）
+- [x] F5 进度反馈 / F6 开始按钮控制 / F7 导出位置 / F8 标题栏
+- [x] 非功能：单文件自包含发布、长路径支持、权限不足跳过不崩溃
+
+## 2. 已完成（v2.0 开发，2026-08-02 ~ 08-03）
+
+- [x] 决策评审：WebView2 方案、导出 xlsx 复选框、两个标签页、删除进回收站、虚拟滚动、名称回车触发、路径树勾选/半勾选、大小档位
+- [x] 文档：PRD / 技术方案升至 v2.0 并定稿；项目更名「文件整理助手 / TooManyFileHelper」
+- [x] 工程更名：csproj 重命名为 `文件整理助手.csproj`，命名空间 / AssemblyName 同步
+- [x] WebView2 集成：引用 Microsoft.Web.WebView2（Evergreen），`ui/index.html` 设为嵌入式资源
+- [x] MainForm 改造：WebView2 宿主 + 消息桥接；初始化失败友好提示
+- [x] BridgeService：postMessage 协议（browse.folder / scan.start / scan.progress 100ms 节流 / scan.done / export.start / export.overwrite / export.result / explorer.select / file.move / file.rename / file.delete / operation.done / toast / error）
+- [x] FileOperations：批量移动（冲突策略）、批量改名（非法字符/重名校验）、批量删除（回收站）
+- [x] 前端：虚拟滚动表格、四类筛选（名称回车/格式多选/路径树/大小档位）、表头排序、批量操作面板、导出覆盖确认、演示模式
+- [x] 端到端验证：真实扫描 → 结果渲染 → xlsx 生成 → 三筛选器（WebView2 真机）均通过
+- [x] 发布：自包含单文件 `publish/文件整理助手.exe`（约 172 MB）在无运行时环境下正常启动
+- [x] Logo 替换：采用「方案 U-2 · 收纳完成（深蓝）」（用户提供图标 + 方案 B 风格上色）；已生成 `src/Assets/app.ico`（16–256 多尺寸）并嵌入页面顶部 Logo、窗口标题栏/任务栏/exe 图标
+
+## 3. 进行中
+
+- [ ] 用户实测反馈：新版（含 Logo）体验确认
+
+## 4. 下一步（迭代计划）
+
+### 4.1 复杂改名规则引擎（P1）
+- [ ] 按分隔符拆分后重排（如《AAA》BB：CCC → CCC AAA）
+- [ ] 正则捕获组重组、多规则组合、实时预览
+
+### 4.2 批量移动增强（P2）
+- [ ] 「保持相对目录结构」选项（源目录树平移到目标目录）
+
+### 4.3 安全增强（P2）
+- [ ] 批量操作前自动备份清单（xlsx）
+- [ ] 改名/移动的撤销或回滚机制（可行范围内）
+
+### 4.4 UI 打磨与发布优化（P3）
+- [ ] 暗色主题、列宽拖拽、列排序指示优化、筛选条件标签展示
+- [ ] 发布体积优化（评估 Trimming 对 ClosedXML/WebView2 的影响；当前 172 MB 超出 70 MB 目标）
+
+---
+
+## 5. 长期备忘
+
+- 每次修改代码后同步刷新 `PROJECT_MAP.md`。
+- 每个功能完成后在 `CHANGELOG.md` 追加「新增 / 改进 / 修复 / 移除」记录。
+- 功能改动涉及行为时，同步更新 `doc/PRD.md` 与 `doc/技术方案文档.md` 的版本号与内容。
+- 开发环境运行 Debug 版需设置 `DOTNET_ROOT=C:\Users\mw\.dotnet`（系统缺 WindowsDesktop.App 运行时）；正式发布用自包含（无需运行时）。
