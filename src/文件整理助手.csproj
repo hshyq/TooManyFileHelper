@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -8,12 +8,18 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <Nullable>enable</Nullable>
     <LongPathAware>true</LongPathAware>
-    <RootNamespace>文件名导出工具</RootNamespace>
-    <AssemblyName>文件名导出工具</AssemblyName>
+    <RootNamespace>文件整理助手</RootNamespace>
+    <AssemblyName>文件整理助手</AssemblyName>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.104.2" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="ui\index.html" />
   </ItemGroup>
 
 </Project>

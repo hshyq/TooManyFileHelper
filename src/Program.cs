@@ -1,6 +1,6 @@
-﻿using System.Windows.Forms;
+using System.Windows.Forms;
 
-namespace 文件名导出工具;
+namespace 文件整理助手;
 
 static class Program
 {

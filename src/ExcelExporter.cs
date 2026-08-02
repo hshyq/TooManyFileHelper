@@ -1,6 +1,6 @@
 using ClosedXML.Excel;
 
-namespace 文件名导出工具;
+namespace 文件整理助手;
 
 public class ExcelExporter
 {

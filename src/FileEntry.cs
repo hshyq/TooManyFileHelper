@@ -1,4 +1,4 @@
-namespace 文件名导出工具;
+namespace 文件整理助手;
 
 /// <summary>
 /// 文件条目数据模型
