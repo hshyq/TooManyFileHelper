@@ -1,0 +1,26 @@
+﻿# .NET build outputs
+bin/
+obj/
+
+# Published single-file exe (上传到 GitHub Releases, 不提交到仓库)
+publish/
+
+# 项目文档
+doc/
+history/
+
+# Visual Studio user settings
+.vs/
+*.user
+*.suo
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# JetBrains Rider / VS Code
+.idea/
+*.sublime-workspace
