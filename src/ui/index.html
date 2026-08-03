@@ -83,7 +83,6 @@ input,select{font-family:inherit}
 .search-wrap{position:relative;flex:1 1 220px;min-width:200px}
 .search-wrap .search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:#94a3b8}
 .search-wrap input{padding-left:30px;width:100%}
-.search-applied{position:absolute;right:34px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--primary);background:var(--primary-bg);border:1px solid var(--primary-line);border-radius:999px;padding:1px 8px;display:none}
 .search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:transparent;color:#94a3b8;cursor:pointer;font-size:14px;line-height:1;padding:2px;display:none}
 .search-clear:hover{color:var(--danger)}
 .dropdown{position:relative}
@@ -272,7 +271,6 @@ input,select{font-family:inherit}
         <div class="search-wrap">
           <span class="search-ico">&#128269;</span>
           <input class="textbox" id="txtNameFilter" placeholder="按文件名称筛选（回车或点击外部后生效）">
-          <span class="search-applied" id="nameApplied"></span>
           <button class="search-clear" id="btnClearName" title="清空名称筛选">✕</button>
         </div>
 
@@ -687,7 +685,7 @@ function handleScanDone(p){
 }
 function buildData(files){
   state.name=''; state.formats.clear(); state.sizeIdx=0; state.sortKey='path'; state.sortDir='asc';
-  $('txtNameFilter').value=''; $('nameApplied').style.display='none';
+  $('txtNameFilter').value='';
   $('txtTreeSearch').value='';
   allData = (files||[]).map(function(f){
     return { name:f.name||'', ext:f.extension||f.ext||'', path:f.fullPath||f.path||'', size:f.size||0, checked:false };
@@ -921,14 +919,6 @@ function sizeMatch(f){
 var nameInput = $('txtNameFilter');
 function applyNameFilter(){
   state.name = nameInput.value.trim().toLowerCase();
-  var tag = $('nameApplied');
-  if (state.name){
-    tag.style.display = 'inline-block';
-    tag.textContent = '已应用：' + state.name;
-  } else {
-    tag.style.display = 'none';
-    tag.textContent = '';
-  }
   applyFilters();
 }
 nameInput.addEventListener('keydown', function(e){ if (e.key==='Enter'){ e.preventDefault(); applyNameFilter(); toast('名称筛选已应用','ok'); } });
@@ -937,7 +927,6 @@ nameInput.addEventListener('input', function(){ $('btnClearName').style.display 
 $('btnClearName').addEventListener('click', function(){
   nameInput.value = '';
   state.name = '';
-  $('nameApplied').style.display = 'none';
   $('btnClearName').style.display = 'none';
   applyFilters();
   toast('已清空名称筛选', 'ok');
@@ -1005,7 +994,7 @@ function renderSortIcons(){
 }
 $('btnClearAll').addEventListener('click', function(){
   state.name=''; state.formats.clear(); state.sizeIdx=0;
-  $('txtNameFilter').value=''; $('nameApplied').style.display='none';
+  $('txtNameFilter').value='';
   $('txtTreeSearch').value='';
   (function clear(ns){ for (var i=0;i<ns.length;i++){ var n=ns[i]; n.checked=false; n.indeterminate=false; clear(n.children); } })(tree);
   applyFilters(); renderFmt(); renderTiers(); renderTree();
