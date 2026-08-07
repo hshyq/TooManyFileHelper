@@ -202,7 +202,7 @@ input,select{font-family:inherit}
     </div>
     <nav class="tabs">
       <button class="tab active" data-tab="scan">扫描配置</button>
-      <button class="tab" data-tab="result" id="tabResult" disabled title="扫描完成后可查看">导出结果<span class="lock">&#128274;</span></button>
+      <button class="tab" data-tab="result" id="tabResult" disabled title="扫描完成后可查看">扫描结果<span class="lock">&#128274;</span></button>
     </nav>
   </header>
 
@@ -264,7 +264,7 @@ input,select{font-family:inherit}
     </div>
   </section>
 
-  <!-- ============ 标签二：导出结果 ============ -->
+  <!-- ============ 标签二：扫描结果 ============ -->
   <section class="panel" id="panel-result">
     <div class="card toolbar-card">
       <div class="toolbar">
@@ -539,11 +539,11 @@ function stamp(){
 var scanning = false;
 function setTabDisabled(disabled){
   $('tabResult').disabled = disabled;
-  $('tabResult').innerHTML = '导出结果' + (disabled ? '<span class="lock">&#128274;</span>' : '');
+  $('tabResult').innerHTML = '扫描结果' + (disabled ? '<span class="lock">&#128274;</span>' : '');
 }
 document.querySelectorAll('.tab').forEach(function(t){
   t.addEventListener('click', function(){
-    if (t.disabled){ toast('扫描完成后可查看导出结果', 'warn'); return; }
+    if (t.disabled){ toast('扫描完成后可查看扫描结果', 'warn'); return; }
     switchTab(t.dataset.tab);
   });
 });
@@ -688,7 +688,10 @@ function buildData(files){
   $('txtNameFilter').value='';
   $('txtTreeSearch').value='';
   allData = (files||[]).map(function(f){
-    return { name:f.name||'', ext:f.extension||f.ext||'', path:f.fullPath||f.path||'', size:f.size||0, checked:false };
+    var raw = f.name||'';
+    var dot = raw.lastIndexOf('.');
+    var baseName = dot > 0 ? raw.substring(0, dot) : raw;
+    return { name: baseName, ext:f.extension||f.ext||'', path:f.fullPath||f.path||'', size:f.size||0, checked:false };
   });
   rebuildIndex();
 }
@@ -745,27 +748,38 @@ var sizeTiers = [
 
 /* ================= 树状路径（从结果构建） ================= */
 var tree = [];
-function buildTreeFromFiles(files){
-  var root = { name:'', full:'', children:[], count:0, checked:false, indeterminate:false, parent:null };
+function buildTreeFromFiles(files, baseDir){
+  var base = (baseDir || '').replace(/\\+$/,'');
+  var baseLower = base.toLowerCase();
+  var rootName = base ? base.split('\\').pop() : '';
+  var root = { name: rootName, full: base, children:[], count:0, checked:false, indeterminate:false, parent:null };
   var map = { '': root };
   files.forEach(function(f){
     var idx = f.path.lastIndexOf('\\');
     var dir = idx >= 0 ? f.path.substring(0, idx) : '';
-    if (!map[dir]){
-      var parts = dir.split('\\');
+    var rel = dir;
+    if (base){
+      var dl = dir.toLowerCase();
+      if (dl === baseLower) rel = '';
+      else if (dl.indexOf(baseLower + '\\') === 0) rel = dir.substring(base.length + 1);
+    }
+    if (!map[rel]){
+      var parts = rel ? rel.split('\\') : [];
       var cur = '';
       var parent = root;
       for (var k=0;k<parts.length;k++){
         cur = cur ? cur + '\\' + parts[k] : parts[k];
         if (!map[cur]){
-          var nn = { name: parts[k], full: cur, children: [], count: 0, checked: false, indeterminate: false, parent: parent };
+          var isAbs = /^[a-zA-Z]:/.test(cur);
+          var full = isAbs ? cur : (cur ? base + '\\' + cur : base);
+          var nn = { name: parts[k], full: full, children: [], count: 0, checked: false, indeterminate: false, parent: parent };
           parent.children.push(nn);
           map[cur] = nn;
         }
         parent = map[cur];
       }
     }
-    map[dir].count++;
+    map[rel].count++;
   });
   function post(node){
     var s = node.count;
@@ -778,7 +792,7 @@ function buildTreeFromFiles(files){
     ns.sort(function(x,y){ return x.name.toLowerCase() < y.name.toLowerCase() ? -1 : 1; });
     for (var i=0;i<ns.length;i++) sortC(ns[i].children);
   })(root.children);
-  return root.children;
+  return base ? [root] : root.children;
 }
 function checkedNodes(nodes, acc){
   for (var i=0;i<nodes.length;i++){
@@ -829,11 +843,12 @@ function renderTree(){
       cb.type = 'checkbox';
       cb.checked = n.checked;
       cb.indeterminate = n.indeterminate;
+      cb.__node = n;
       (function(node, check){ check.addEventListener('change', function(){
         setSubChecked(node, check.checked);
         refreshAncestors(node);
         applyFilters();
-        renderTree();
+        syncTreeChecks();
       }); })(n, cb);
       var ico = document.createElement('span');
       ico.className = 'folder-ico';
@@ -853,6 +868,18 @@ function renderTree(){
       walk(n.children, depth+1);
     }
   })(tree, 0);
+}
+function syncTreeChecks(){
+  var selCount = checkedNodes(tree, []).length;
+  $('pathFt').textContent = '已选 ' + selCount + ' 个文件夹';
+  var inputs = $('treeBox').querySelectorAll('input[type=checkbox]');
+  for (var i=0;i<inputs.length;i++){
+    var cb = inputs[i];
+    if (cb.__node){
+      cb.checked = cb.__node.checked;
+      cb.indeterminate = cb.__node.indeterminate;
+    }
+  }
 }
 $('txtTreeSearch').addEventListener('input', renderTree);
 $('clearPath').addEventListener('click', function(){
@@ -1034,7 +1061,7 @@ function renderRows(){
       return function(){ f.checked = c.checked; row.classList.toggle('selected-row', f.checked); updateSelectedCount(); };
     })(f, cb, row));
     var c1 = document.createElement('span'); c1.className='col-check'; c1.appendChild(cb);
-    var c2 = document.createElement('span'); c2.className='cell name'; c2.textContent = f.name + f.ext; c2.title = f.name + f.ext;
+    var c2 = document.createElement('span'); c2.className='cell name'; c2.textContent = f.name; c2.title = f.name + f.ext;
     var c3 = document.createElement('span'); c3.className='cell ext'; c3.textContent = f.ext;
     var c4 = document.createElement('span'); c4.className='cell path'; c4.textContent = f.path; c4.title = '点击在资源管理器中打开并选中';
     c4.addEventListener('click', (function(p){ return function(){
@@ -1278,7 +1305,7 @@ function rebuildIndex(){
   extCounts = {};
   allData.forEach(function(f){ extCounts[f.ext] = (extCounts[f.ext]||0)+1; });
   extList = Object.keys(extCounts).sort();
-  tree = buildTreeFromFiles(allData);
+  tree = buildTreeFromFiles(allData, demoMode ? '' : $('txtFolder').value.trim());
   applyFilters(); renderFmt(); renderTiers(); renderTree();
 }
 
