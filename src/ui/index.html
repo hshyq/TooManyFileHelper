@@ -811,10 +811,14 @@ function refreshAncestors(node){
   var p = node.parent;
   while (p){
     var arr = p.children;
-    var checked = 0, all = arr.length;
-    for (var i=0;i<all;i++){ if (arr[i].checked || arr[i].indeterminate) checked++; }
-    p.checked = checked===all;
-    p.indeterminate = !p.checked && checked>0;
+    var all = arr.length;
+    var fullChecked = 0, partial = 0;
+    for (var i=0;i<all;i++){
+      if (arr[i].checked) fullChecked++;
+      else if (arr[i].indeterminate) partial++;
+    }
+    p.checked = fullChecked === all;
+    p.indeterminate = !p.checked && (fullChecked > 0 || partial > 0);
     p = p.parent;
   }
 }
