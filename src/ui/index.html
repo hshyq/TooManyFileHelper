@@ -812,7 +812,7 @@ function refreshAncestors(node){
   while (p){
     var arr = p.children;
     var checked = 0, all = arr.length;
-    for (var i=0;i<all;i++){ if (arr[i].checked) checked++; }
+    for (var i=0;i<all;i++){ if (arr[i].checked || arr[i].indeterminate) checked++; }
     p.checked = checked===all;
     p.indeterminate = !p.checked && checked>0;
     p = p.parent;
@@ -844,12 +844,17 @@ function renderTree(){
       cb.checked = n.checked;
       cb.indeterminate = n.indeterminate;
       cb.__node = n;
-      (function(node, check){ check.addEventListener('change', function(){
-        setSubChecked(node, check.checked);
-        refreshAncestors(node);
-        applyFilters();
-        syncTreeChecks();
-      }); })(n, cb);
+      (function(node, check){
+        check.addEventListener('change', function(){
+          setSubChecked(node, check.checked);
+          refreshAncestors(node);
+          applyFilters();
+          syncTreeChecks();
+        });
+        row.addEventListener('click', function(e){
+          if (e.target !== check){ check.click(); }
+        });
+      })(n, cb);
       var ico = document.createElement('span');
       ico.className = 'folder-ico';
       ico.textContent = n.children.length ? '\uD83D\uDCC1' : '\uD83D\uDCC2';
@@ -861,9 +866,6 @@ function renderTree(){
       cnt.className = 'cnt';
       cnt.textContent = n.totalCount.toLocaleString() + ' 个';
       row.appendChild(cb); row.appendChild(ico); row.appendChild(nmel); row.appendChild(cnt);
-      row.addEventListener('click', function(e){
-        if (e.target !== cb){ cb.click(); }
-      });
       box.appendChild(row);
       walk(n.children, depth+1);
     }
@@ -910,7 +912,7 @@ function renderFmt(){
       if (cb.checked) state.formats.add(ext); else state.formats.delete(ext);
       applyFilters(); renderFmt();
     });
-    var nm = document.createElement('span'); nm.textContent = ext;
+    var nm = document.createElement('span'); nm.textContent = ext || '无扩展名';
     var cnt = document.createElement('span'); cnt.className = 'cnt'; cnt.textContent = (extCounts[ext]||0).toLocaleString();
     item.appendChild(cb); item.appendChild(nm); item.appendChild(cnt);
     list.appendChild(item);
@@ -1062,7 +1064,7 @@ function renderRows(){
     })(f, cb, row));
     var c1 = document.createElement('span'); c1.className='col-check'; c1.appendChild(cb);
     var c2 = document.createElement('span'); c2.className='cell name'; c2.textContent = f.name; c2.title = f.name + f.ext;
-    var c3 = document.createElement('span'); c3.className='cell ext'; c3.textContent = f.ext;
+    var c3 = document.createElement('span'); c3.className='cell ext'; c3.textContent = f.ext || '无扩展名';
     var c4 = document.createElement('span'); c4.className='cell path'; c4.textContent = f.path; c4.title = '点击在资源管理器中打开并选中';
     c4.addEventListener('click', (function(p){ return function(){
       if (demoMode){ toast('（预览）将在资源管理器中打开并选中：' + p, 'ok'); return; }
