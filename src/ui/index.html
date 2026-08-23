@@ -1596,24 +1596,38 @@ $('btnHistoryClose').addEventListener('click', function(){ closeModal('modalRena
 function rnRenderHistory(){
   var body = $('renameHistoryBody');
   if (!rnHistory.length){ body.innerHTML = '<div class="rn-empty">本次运行期间暂无改名记录。</div>'; return; }
-  var html = '';
-  rnHistory.forEach(function(h, i){
+  var html = '<div class="rn-empty" style="margin-bottom:6px">只能按操作顺序从最近一次开始逐步撤销。</div>';
+  for (var i = rnHistory.length - 1; i >= 0; i--){
+    var h = rnHistory[i];
+    var isLatest = (i === rnHistory.length - 1);
     html += '<div class="rn-hist-item">';
-    html += '<div class="rn-hist-hd"><b>' + h.time + '</b><span>成功 ' + h.ok + ' 个</span><span style="margin-left:auto">' +
-      '<button class="btn" data-undo="' + i + '">撤销</button></span></div>';
+    html += '<div class="rn-hist-hd"><b>' + h.time + '</b><span>成功 ' + h.ok + ' 个</span><span style="margin-left:auto">';
+    if (h.undoing){
+      html += '<span style="color:#94a3b8;font-size:12px">撤销中…</span>';
+    } else if (isLatest){
+      html += '<button class="btn" data-undo="' + i + '">撤销</button>';
+    } else {
+      html += '<span style="color:#94a3b8;font-size:12px">需先撤销上一步</span>';
+    }
+    html += '</span></div>';
     html += '<div class="rn-hist-files">' + h.items.slice(0, 10).map(function(it){
-      return escapeHtml(it.oldBase) + ' \u2192 ' + escapeHtml(it.newName);
-    }).join('<br>') + (h.items.length > 10 ? '<br>\u2026 等共 ' + h.items.length + ' 项' : '') + '</div>';
+      return escapeHtml(it.oldBase) + ' → ' + escapeHtml(it.newName);
+    }).join('<br>') + (h.items.length > 10 ? '<br>… 等共 ' + h.items.length + ' 项' : '') + '</div>';
     html += '</div>';
-  });
+  }
   body.innerHTML = html;
   Array.prototype.slice.call(body.querySelectorAll('[data-undo]')).forEach(function(btn){
     btn.addEventListener('click', function(){ rnUndoHistory(parseInt(btn.getAttribute('data-undo'), 10)); });
   });
 }
 function rnUndoHistory(idx){
+  if (idx !== rnHistory.length - 1){
+    toast('只能从最近一次操作开始逐步撤销','warn');
+    return;
+  }
   var h = rnHistory[idx];
-  if (!h){ toast('记录不存在','err'); return; }
+  if (!h || h.undoing){ return; }
+  h.undoing = true;
   var reverse = h.items.map(function(it){
     var dir = it.newPath.substring(0, it.newPath.lastIndexOf('\\'));
     return { path: it.newPath, newName: it.oldBase + it.ext };
@@ -1686,7 +1700,7 @@ function handleOperationDone(p){
       }
     });
     if (lastOp.undo){
-      if (lastOp.undoIdx !== undefined && rnHistory[lastOp.undoIdx]) rnHistory.splice(lastOp.undoIdx, 1);
+      if (lastOp.undoIdx !== undefined && rnHistory[lastOp.undoIdx]){ if (p.succeeded > 0) rnHistory.splice(lastOp.undoIdx, 1); else rnHistory[lastOp.undoIdx].undoing = false; }
     } else {
       var histItems = lastOp.items.map(function(it){
         var dir = it.path.substring(0, it.path.lastIndexOf('\\'));
