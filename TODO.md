@@ -85,7 +85,7 @@
 - [x] Release 附件更新：`publish\TooManyFileHelper-v2.1.2-win-x64.zip`
 - [x] 产物验证：无 PDB/XML、版本正确、ZIP 单文件位于根目录、启动冒烟通过、运行后不污染 publish 目录
 - [x] 使用用户真实迁移文件夹实测：用户确认测试通过（2026-11-21）
-- [ ] 实测通过后上传 GitHub Release
+- [x] GitHub Release v2.1.2 已发布：https://github.com/hshyq/TooManyFileHelper/releases/tag/v2.1.2
 - [ ] 图片、视频查重在 TXT 已实测通过的基础上单独评估，不与精确查重混用删除逻辑
 
 ## 6. 长期备忘
