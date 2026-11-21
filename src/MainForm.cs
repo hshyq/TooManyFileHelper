@@ -39,7 +39,17 @@ public partial class MainForm : Form
     {
         try
         {
-            await webView.EnsureCoreWebView2Async();
+            // 将浏览器缓存和用户数据放到 LocalAppData，避免在 publish/exe 同目录生成 .WebView2 目录
+            string userDataFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "TooManyFileHelper",
+                "WebView2");
+            Directory.CreateDirectory(userDataFolder);
+
+            var environment = await CoreWebView2Environment.CreateAsync(
+                browserExecutableFolder: null,
+                userDataFolder: userDataFolder);
+            await webView.EnsureCoreWebView2Async(environment);
             webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
             webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
             webView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;

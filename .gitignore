@@ -2,6 +2,9 @@
 bin/
 obj/
 
+# WebView2 runtime user data / cache (normally stored in LocalAppData)
+*.WebView2/
+
 # Published single-file exe (上传到 GitHub Releases, 不提交到仓库)
 publish/
 

@@ -40,7 +40,7 @@ partial class MainForm
         this.MinimumSize = new System.Drawing.Size(940, 660);
         this.Name = "MainForm";
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-        this.Text = "文件整理助手 v2.0";
+        this.Text = "文件整理助手";
         this.ResumeLayout(false);
     }
 

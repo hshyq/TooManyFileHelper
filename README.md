@@ -9,13 +9,13 @@
 
 ### 项目简介
 
-「文件整理助手」是一款面向 Windows 10/11 x64 的免安装单文件工具。选定目标文件夹后，程序递归遍历该文件夹下所有文件（含所有层级子文件夹），在本地 HTML 界面中展示文件清单，支持按 **文件名称 / 格式 / 所在路径 / 文件大小** 搜索筛选、表头排序，并可勾选多个文件（可跨文件夹）执行**批量移动、批量改名、批量删除（回收站）**。可选导出包含 **文件名称、格式、所在全路径、文件大小** 的 `.xlsx` 清单。
+「文件整理助手」是一款面向 Windows 10/11 x64 的免安装单文件工具。选定目标文件夹后，程序递归遍历该文件夹下所有文件（含所有层级子文件夹），在本地 HTML 界面中展示文件清单，支持按 **文件名称 / 格式 / 所在路径 / 文件大小** 搜索筛选、表头排序，并可勾选多个文件（可跨文件夹）执行**批量移动、批量改名、批量删除（回收站）**。v2.1 新增 **TXT 内容查重**，忽略文件名和目录位置，通过大小预筛和 SHA-256 找出逐字节完全相同的 TXT 文件。可选导出包含 **文件名称、格式、所在全路径、文件大小** 的 `.xlsx` 清单。
 
 适合文件归档整理、资产盘点、目录结构导出等场景。无需命令行知识，双击即可使用。
 
 ### 功能特性
 
-- **本地 HTML 界面**：WebView2 承载，两个标签页（扫描配置 / 扫描结果），现代 UI 设计。
+- **本地 HTML 界面**：WebView2 承载，四个标签页（扫描配置 / 扫描结果 / TXT 查重 / 查重结果），现代 UI 设计。
 - **递归扫描**：遍历所有子文件夹层级，深度无上限；支持「包含隐藏文件和文件夹」选项。
 - **智能跳过**：权限不足的文件夹自动跳过并提示；符号链接 / 连接点 / 挂载点目录跳过避免循环引用；压缩文件仅记录本身，不解包。
 - **虚拟滚动表格**：10 万级文件流畅浏览，DOM 渲染量恒定。
@@ -25,6 +25,7 @@
 - **批量移动**：跨文件夹勾选 → 选择目标文件夹 → 预览「源 → 目标」→ 冲突策略（跳过/覆盖/自动重命名，默认跳过）→ 结果汇总。
 - **批量改名**：前缀 / 后缀 / 查找替换 / 序号填充，可组合；执行前展示「改前 → 改后」预览；重名/非法字符/占用项跳过并汇总。
 - **批量删除**：待删清单二次确认 → 移入回收站（可还原）；只读/占用项跳过并汇总。
+- **TXT 内容查重**：递归扫描 `.txt` / `.TXT`，按大小预筛后计算 SHA-256；文件名和所在目录不参与判断。结果按重复组每页 20/50/100 组分页，支持全局搜索、跨页选择、每组保留一份、失败明细穿透和回收站清理。
 - **可选导出 xlsx**：默认勾选「导出 xlsx」，取消则不生成 Excel；默认文件名 `文件名导出_{yyyyMMdd_HHmmss}.xlsx`（秒级时间戳 + 刷新按钮，同秒自动追加随机后缀）。
 - **实时进度**：收集阶段点动画 + Marquee 进度条，读取阶段百分比 + 当前文件 + 文件计数；进度消息 100ms 节流。
 - **长路径支持**：支持超过 260 字符的深层路径。
@@ -33,7 +34,7 @@
 
 ```
  ┌──────────────────────────────────────────────────────────────┐
- │  (Logo) 文件整理助手 v2.0.2               [扫描配置] [扫描结果]  │
+ │  (Logo) 文件整理助手 v2.1.2 [扫描配置][扫描结果][TXT查重][查重结果] │
  ├──────────────────────────────────────────────────────────────┤
  │  扫描配置（标签 1）                                           │
  │  目标文件夹: [____________] [浏览文件夹]   ☐ 包含隐藏文件      │
@@ -88,7 +89,7 @@ dotnet publish src/文件整理助手.csproj -c Release -r win-x64 --self-contai
   -o ./publish
 ```
 
-产物为 `publish/文件整理助手.exe`，可在任意 Windows 10/11 x64 机器上双击运行，无需预装运行时（WebView2 运行时 Win11 自带、Win10 基本随 Edge 安装）。发布产物通过 GitHub Releases 分发，不提交到仓库。
+产物为 `publish/文件整理助手.exe`，Release 附件为 `publish/TooManyFileHelper-v2.1.2-win-x64.zip`。可在任意 Windows 10/11 x64 机器上双击运行，无需预装运行时（WebView2 运行时 Win11 自带、Win10 基本随 Edge 安装）。发布产物通过 GitHub Releases 分发，不提交到仓库。
 
 ### 项目结构
 
@@ -103,10 +104,15 @@ dotnet publish src/文件整理助手.csproj -c Release -r win-x64 --self-contai
 |   +-- FileOperations.cs    # 批量移动 / 改名 / 删除
 |   +-- ExcelExporter.cs     # .xlsx 导出（可选）
 |   +-- FileEntry.cs         # 数据模型
+|   +-- DuplicateBridgeService.cs # TXT 查重消息、取消和删除保护
+|   +-- DuplicateScanner.cs  # TXT 大小预筛 + SHA-256 分组
+|   +-- DuplicateModels.cs   # 查重结果与进度模型
+|   +-- FileContentHasher.cs # 流式 SHA-256
 |   +-- ui/index.html        # HTML 界面（嵌入式资源）
 |   +-- Assets/              # Logo 与图标资源（logo.svg / app.ico）
 |   +-- 文件整理助手.csproj
 +-- doc/                     # 产品与设计文档
++-- tests/                   # 无第三方依赖的冒烟测试
 +-- AGENTS.md                # AI 协作规范
 +-- PROJECT_MAP.md           # 代码地图
 +-- TODO.md                  # 开发计划
@@ -131,13 +137,13 @@ dotnet publish src/文件整理助手.csproj -c Release -r win-x64 --self-contai
 
 ### About
 
-**TooManyFileHelper** is a portable, single-file Windows tool for Windows 10/11 x64. Pick a target folder and it recursively scans every file (including files in all subfolders), then shows the inventory in a local HTML interface. You can search and filter by **name / extension / folder path / size**, sort columns, and select multiple files (across folders) to **move, rename, or delete (to Recycle Bin)** in batch. Optionally export a `.xlsx` inventory with **file name, extension, full path, and file size**.
+**TooManyFileHelper** is a portable, single-file Windows tool for Windows 10/11 x64. Pick a target folder and it recursively scans every file (including files in all subfolders), then shows the inventory in a local HTML interface. You can search and filter by **name / extension / folder path / size**, sort columns, and select multiple files (across folders) to **move, rename, or delete (to Recycle Bin)** in batch. v2.1 adds **TXT content deduplication**, which ignores file names and folder locations and finds byte-identical TXT files using size prefiltering and SHA-256. Optionally export a `.xlsx` inventory with **file name, extension, full path, and file size**.
 
 It is handy for archiving, asset inventory, or quickly capturing a directory structure — no command-line knowledge required.
 
 ### Features
 
-- **Local HTML UI** powered by WebView2, with two tabs: Scan Settings / Results.
+- **Local HTML UI** powered by WebView2, with four tabs: Scan Settings / Results / TXT Duplicate Finder / Duplicate Results.
 - **Recursive scanning** with no depth limit; optional inclusion of hidden files and folders.
 - **Smart skipping**: inaccessible folders are skipped and reported; symbolic links / junctions / mount points are skipped; archives are listed without being unpacked.
 - **Virtual-scroll table**: smooth browsing of 100k+ files with constant DOM size.
@@ -147,17 +153,18 @@ It is handy for archiving, asset inventory, or quickly capturing a directory str
 - **Batch move**: pick a target folder → preview source→target → conflict policy (skip/overwrite/auto-rename, skip by default) → summary.
 - **Batch rename**: prefix / suffix / find-replace / sequence number, combinable; preview before applying; conflicts are skipped and reported.
 - **Batch delete**: confirm the list → move to Recycle Bin (restorable); read-only or locked files are skipped and reported.
+- **TXT content deduplication**: find `.txt` / `.TXT` files with identical bytes regardless of name or folder; results are paginated by duplicate group (20/50/100 per page), with cross-page selection, one retained file per group, failure drill-down, and Recycle Bin cleanup.
 - **Optional xlsx export** (checked by default; uncheck to skip Excel). Default file name `文件名导出_{yyyyMMdd_HHmmss}.xlsx` (second-precision timestamp + refresh button; a random suffix is appended if generated in the same second).
 - **Live progress** with throttled updates (100ms) and a locked results tab during scanning.
 - **Long path support** beyond 260 characters.
 
 ### UI Preview (text)
 
-The interface is in Chinese; the window has two tabs. The layout is identical to the Chinese README above:
+The interface is in Chinese; the window has four tabs. The scan and result tabs are shown below:
 
 ```
  ┌──────────────────────────────────────────────────────────────┐
- │  (Logo) 文件整理助手 v2.0.2               [扫描配置] [扫描结果]  │
+ │  (Logo) 文件整理助手 v2.1.2 [扫描配置][扫描结果][TXT查重][查重结果] │
  ├──────────────────────────────────────────────────────────────┤
  │  扫描配置（标签 1）                                           │
  │  目标文件夹: [____________] [浏览文件夹]   ☐ 包含隐藏文件      │
@@ -217,7 +224,7 @@ dotnet publish src/文件整理助手.csproj -c Release -r win-x64 --self-contai
   -o ./publish
 ```
 
-The output `publish/文件整理助手.exe` runs on any Windows 10/11 x64 machine without installing a runtime (WebView2 Runtime is built into Windows 11 and usually present on Windows 10). Release binaries are distributed via GitHub Releases and are not committed to the repository.
+The output `publish/文件整理助手.exe` and the release archive `publish/TooManyFileHelper-v2.1.2-win-x64.zip` run on any Windows 10/11 x64 machine without installing a .NET runtime (WebView2 Runtime is built into Windows 11 and usually present on Windows 10). Release binaries are distributed via GitHub Releases and are not committed to the repository.
 
 ### Repository Layout
 
@@ -231,10 +238,15 @@ The output `publish/文件整理助手.exe` runs on any Windows 10/11 x64 machin
 |   +-- FileOperations.cs    # Batch move / rename / delete
 |   +-- ExcelExporter.cs     # Optional xlsx export
 |   +-- FileEntry.cs         # Data model
+|   +-- DuplicateBridgeService.cs # TXT duplicate-finder protocol
+|   +-- DuplicateScanner.cs  # Size prefilter + SHA-256 groups
+|   +-- DuplicateModels.cs   # Duplicate result/progress models
+|   +-- FileContentHasher.cs # Streaming SHA-256
 |   +-- ui/index.html        # HTML UI (embedded resource)
 |   +-- Assets/              # Logo & icon assets
 |   +-- 文件整理助手.csproj
 +-- doc/                     # Product and design documents
++-- tests/                   # Dependency-free smoke tests
 +-- AGENTS.md                # AI collaboration rules
 +-- PROJECT_MAP.md           # Code map
 +-- TODO.md                  # Roadmap

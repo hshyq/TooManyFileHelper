@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>文件整理助手 v2.0 - UI 预览</title>
+<title>文件整理助手</title>
 <style>
 :root{
   --bg:#eef1f6; --card:#ffffff; --line:#e3e8f0; --text:#1f2937; --muted:#6b7280;
@@ -53,6 +53,7 @@ input,select{font-family:inherit}
 .textbox:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
 .btn{height:34px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:0 14px;font-size:13px;color:#374151;transition:all .15s;white-space:nowrap}
 .btn:hover{border-color:#cbd5e1;background:#f8fafc}
+.btn:disabled{opacity:.46;cursor:not-allowed}
 .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600;box-shadow:0 2px 6px rgba(37,99,235,.3)}
 .btn.primary:hover{background:var(--primary-h)}
 .btn.primary:disabled{background:#93c5fd;border-color:#93c5fd;cursor:not-allowed;box-shadow:none}
@@ -226,6 +227,67 @@ input,select{font-family:inherit}
 
 /* 预览提示条 */
 .preview-note{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:1080px;margin:0 auto;background:#fefce8;border-top:1px solid #fde68a;color:#854d0e;font-size:12px;padding:8px 20px;text-align:center}
+
+/* ===== TXT 查重 ===== */
+.dup-card-intro{padding:8px 20px;background:var(--primary-bg);border-bottom:1px solid var(--primary-line);color:#1e40af;font-size:12.5px}
+.dup-checks{display:flex;gap:20px;flex-wrap:wrap;margin-left:106px}
+.dup-format-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.dup-format{position:relative;display:block;border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff;cursor:pointer}
+.dup-format.selected{border-color:var(--primary);background:var(--primary-bg);box-shadow:0 0 0 1px var(--primary)}
+.dup-format.disabled{opacity:.62;cursor:not-allowed;background:#f8fafc}.dup-format input{position:absolute;opacity:0}
+.dup-format .ft{font-weight:700;margin-bottom:3px}.dup-format .fs{font-size:12px;color:var(--muted)}
+.dup-rule{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:11px 12px;margin-bottom:9px;cursor:pointer}
+.dup-rule.selected{border-color:var(--primary);background:var(--primary-bg)}.dup-rule input{width:16px;height:16px;margin-top:2px;accent-color:var(--primary)}
+.dup-rule b{display:block;font-size:13.5px}.dup-rule span{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
+.dup-rule.disabled{opacity:.58;cursor:not-allowed}
+.dup-phasebar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.dup-phase{padding:8px 10px;border-radius:8px;background:#f8fafc;border:1px solid var(--line);font-size:12px;color:#64748b}
+.dup-phase.active{color:var(--primary);border-color:var(--primary-line);background:var(--primary-bg);font-weight:650}
+.dup-phase.done{color:#15803d;border-color:var(--ok-line);background:var(--ok-bg)}
+.dup-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.dup-metric{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px}
+.dup-metric .n{font-size:22px;font-weight:750;font-variant-numeric:tabular-nums}.dup-metric .k{font-size:12px;color:var(--muted);margin-top:2px}
+.dup-metric-link{position:relative;width:100%;text-align:left;color:inherit;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
+.dup-metric-link:hover:not(:disabled){border-color:var(--primary-line);box-shadow:0 6px 18px rgba(37,99,235,.12);transform:translateY(-1px)}
+.dup-metric-link:focus-visible{outline:3px solid rgba(37,99,235,.2);outline-offset:2px}
+.dup-metric-link:disabled{cursor:default;opacity:.72}.dup-metric-link .more{position:absolute;right:16px;bottom:15px;color:var(--primary);font-size:11.5px;font-weight:600}
+.dup-metric-link:disabled .more{color:var(--muted)}
+.dup-safe{display:flex;align-items:center;gap:8px;padding:9px 20px;background:var(--ok-bg);border-bottom:1px solid var(--ok-line);color:#166534;font-size:12.5px}
+.dup-group{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+.dup-group-hd{display:flex;align-items:center;gap:10px;padding:13px 16px;background:#f8fafc;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+.dup-chev{width:20px;color:#64748b;transition:transform .15s}.dup-group.collapsed .dup-chev{transform:rotate(-90deg)}
+.dup-group.collapsed .dup-group-bd{display:none}.dup-group-title{font-weight:700;font-size:13.5px}
+.dup-group-meta{margin-left:auto;color:var(--muted);font-size:12px;text-align:right}.dup-group-meta b{color:var(--danger)}
+.dup-hash{font-size:11.5px;font-family:Consolas,monospace;color:#64748b;background:#eef2f7;padding:2px 7px;border-radius:5px}
+.dup-file-head,.dup-file-row{display:grid;grid-template-columns:64px 58px minmax(0,1fr) 138px 88px;align-items:center;gap:8px}
+.dup-file-head{height:34px;padding:0 16px;border-bottom:1px solid #f1f5f9;font-size:11.5px;color:#94a3b8}
+.dup-file-row{min-height:56px;padding:8px 16px;border-bottom:1px solid #f1f5f9}.dup-file-row:last-child{border-bottom:0}
+.dup-file-row:hover{background:#f8fafc}.dup-file-row.keep{background:var(--ok-bg)}.dup-file-row.picked{background:#fff7ed}
+.dup-file-row input[type=radio],.dup-file-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--primary);cursor:pointer}
+.dup-file-row .center{text-align:center}.dup-file-row input[type=radio]{accent-color:var(--ok)}
+.dup-file-main{min-width:0}.dup-file-name{font-weight:600;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dup-file-path{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.dup-file-time,.dup-file-size{font-size:12px;color:#64748b;font-variant-numeric:tabular-nums}.dup-file-size{text-align:right}
+.dup-keep-badge,.dup-pick-badge{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:999px;margin-left:5px;font-weight:600}
+.dup-keep-badge{background:#dcfce7;color:#15803d}.dup-pick-badge{background:#ffedd5;color:#c2410c}
+.dup-pagination{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid var(--line);background:#fff}
+.dup-pagination .page-info{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dup-page-input{width:58px;height:30px;text-align:center;padding:0 6px}
+.dup-page-size{height:32px;border:1px solid var(--line);border-radius:8px;padding:0 8px;background:#fff;color:#475569}
+.dup-actionbar{position:sticky;bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px;padding:13px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.96);box-shadow:0 10px 30px rgba(15,23,42,.12);backdrop-filter:blur(8px)}
+.dup-actionbar .summary{font-size:13px;color:#475569}.dup-actionbar b{color:var(--text)}
+.dup-empty{display:none;padding:60px 20px;text-align:center;color:#94a3b8}.dup-empty .big{font-size:34px;margin-bottom:8px}
+.dup-skip-summary{padding:10px 12px;border:1px solid #fde68a;background:#fffbeb;color:#854d0e;border-radius:9px;font-size:12.5px;margin-bottom:12px}
+.dup-skip-list{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.dup-skip-row{padding:10px 12px;border-bottom:1px solid #f1f5f9}.dup-skip-row:last-child{border-bottom:0}
+.dup-skip-row:hover{background:#f8fafc}.dup-skip-top{display:flex;align-items:center;gap:8px;min-width:0}
+.dup-skip-name{font-size:13px;font-weight:600;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dup-skip-reason{margin-left:auto;flex:none;padding:2px 7px;border-radius:999px;background:var(--danger-bg);border:1px solid var(--danger-line);color:var(--danger);font-size:11px}
+.dup-skip-path{margin-top:3px;color:var(--muted);font-size:11.5px;word-break:break-all}
+.dup-skip-modal{height:min(82vh,820px);display:flex;flex-direction:column}
+.dup-skip-modal .modal-bd{max-height:none;min-height:0;flex:1;overflow:hidden;display:flex;flex-direction:column}
+.dup-skip-modal .dup-skip-summary{flex:none}.dup-skip-modal .dup-skip-list{max-height:none;min-height:0;flex:1;overflow-y:auto;overflow-x:hidden}
+@media(max-width:850px){.dup-format-grid{grid-template-columns:1fr}.dup-metrics{grid-template-columns:repeat(2,1fr)}.dup-checks{margin-left:0}.dup-file-head,.dup-file-row{grid-template-columns:54px 48px minmax(0,1fr) 80px}.dup-file-head span:nth-child(4),.dup-file-row .dup-file-time{display:none}}
 </style>
 </head>
 <body>
@@ -242,11 +304,13 @@ input,select{font-family:inherit}
   <rect width="100" height="100" rx="22" fill="url(#logoGrad)"/>
   <g transform="translate(11.6 10.5)"><path d="M57.0994 3.6C57.0994 1.615 55.4834 0 53.4994 0C51.5154 0 49.8994 1.615 49.8994 3.6C49.8994 5.585 51.5154 7.2 53.4994 7.2C55.4834 7.2 57.0994 5.585 57.0994 3.6ZM51.8994 3.6C51.8994 4.482 52.6174 5.2 53.4994 5.2C54.3814 5.2 55.0994 4.482 55.0994 3.6C55.0994 2.718 54.3814 2 53.4994 2C52.6174 2 51.8994 2.718 51.8994 3.6ZM37.4994 8.2C43.0224 8.2 47.4994 12.677 47.4994 18.2C47.4994 23.723 43.0224 28.2 37.4994 28.2C31.9764 28.2 27.4994 23.723 27.4994 18.2C27.4994 12.677 31.9764 8.2 37.4994 8.2ZM35.2894 21.81L32.5894 19.11C32.1984 18.72 32.1984 18.08 32.5894 17.69C32.9804 17.3 33.6194 17.3 34.0094 17.69L35.9994 19.69L40.9894 14.69C41.3804 14.3 42.0194 14.3 42.4094 14.69C42.8004 15.081 42.8004 15.72 42.4094 16.11L36.7094 21.81C36.3184 22.201 35.6794 22.201 35.2894 21.81ZM18.6282 21.5358C19.0842 21.9528 19.1582 22.4528 19.1582 22.7958C19.1582 23.3048 18.9362 23.8128 18.5582 24.2258C18.1842 24.6328 18.2212 25.2628 18.6282 25.6358C18.8202 25.8118 19.0572 25.8958 19.2982 25.8958C19.5692 25.8958 19.8422 25.7908 20.0382 25.5758C20.7472 24.8028 21.1422 23.8238 21.1582 22.8258C21.1762 21.7598 20.7622 20.7838 19.9782 20.0658C18.3832 18.6058 15.9662 18.6168 14.4882 20.0958C14.0972 20.4868 14.0972 21.1148 14.4882 21.5058C14.8792 21.8968 15.5182 21.8958 15.9082 21.5058C16.6292 20.7868 17.8252 20.7998 18.6282 21.5358ZM53.5095 30.7094C53.0645 30.3834 52.9635 29.7544 53.2895 29.3094L56.2895 25.2094C56.6135 24.7644 57.2415 24.6634 57.6895 24.9894C58.1345 25.3154 58.2355 25.9444 57.9095 26.3894L54.9095 30.4894C54.7135 30.7574 54.4085 30.8994 54.0995 30.8994C53.8945 30.8994 53.6885 30.8394 53.5095 30.7094ZM66.5303 37.229C66.5693 37.272 66.6083 37.309 66.6403 37.359L76.6403 52.959C76.8373 53.268 76.8563 53.659 76.6803 53.979C76.5053 54.301 76.1653 54.499 75.8003 54.499L66.8003 54.499L66.8003 77.899C66.8003 78.452 66.3533 78.899 65.8003 78.899L11.0003 78.899C10.4483 78.899 10.0003 78.452 10.0003 77.899L10.0003 54.499L1.00034 54.499C0.634336 54.499 0.295336 54.3 0.120336 53.979C-0.0546643 53.658 -0.0366643 53.268 0.160336 52.959L10.1603 37.359C10.1923 37.308 10.2303 37.272 10.2703 37.229C10.2823 37.216 10.2873 37.191 10.3003 37.179C10.3813 37.1 10.4783 37.046 10.5803 36.999C10.6033 36.988 10.6263 36.969 10.6503 36.969C10.7603 36.928 10.8793 36.899 11.0003 36.899L65.8003 36.899C65.9213 36.899 66.0403 36.928 66.1503 36.969C66.1753 36.969 66.1963 36.988 66.2203 36.999C66.3213 37.046 66.4193 37.1 66.5003 37.179C66.5133 37.192 66.5183 37.216 66.5303 37.229ZM21.8503 52.499L2.83034 52.499L11.5503 38.899L30.5703 38.899L21.8503 52.499ZM65.2503 38.899L73.9703 52.499L42.9503 52.499L34.2303 38.899L65.2503 38.899ZM12.0003 76.519L12.0003 54.499L22.4003 54.499C22.7413 54.499 23.0563 54.325 23.2403 54.039L31.4003 41.309L31.4003 67.279L12.0003 76.519ZM42.4003 54.499L64.8003 54.499L64.8003 76.899L33.4003 76.899L33.4003 41.309L41.5603 54.039C41.7443 54.325 42.0593 54.499 42.4003 54.499ZM61.7994 73.9L52.0994 73.9L52.0994 69.6L61.7994 69.6L61.7994 73.9Z" fill-rule="evenodd" fill="#ffffff"/></g>
 </svg></div>
-      <div class="title">文件整理助手<span class="ver">v2.0</span></div>
+      <div class="title">文件整理助手<span class="ver">v2.1.2</span></div>
     </div>
     <nav class="tabs">
       <button class="tab active" data-tab="scan">扫描配置</button>
       <button class="tab" data-tab="result" id="tabResult" disabled title="扫描完成后可查看">扫描结果<span class="lock">&#128274;</span></button>
+      <button class="tab" data-tab="dup">TXT 查重</button>
+      <button class="tab" data-tab="dupResult" id="tabDupResult" disabled title="查重完成后可查看">查重结果<span class="lock">&#128274;</span></button>
     </nav>
   </header>
 
@@ -380,6 +444,147 @@ input,select{font-family:inherit}
       </div>
     </div>
   </section>
+
+  <!-- ============ 标签三：TXT 查重配置 ============ -->
+  <section class="panel" id="panel-dup">
+    <div class="card">
+      <div class="card-hd"><span class="dot"></span>查重范围</div>
+      <div class="card-bd">
+        <div class="field">
+          <span class="lbl">目标文件夹</span>
+          <input class="textbox" id="dupTxtFolder" placeholder="选择包含 TXT 文件的历史资料文件夹">
+          <button class="btn" id="btnDupBrowse">浏览文件夹</button>
+        </div>
+        <div class="dup-checks">
+          <label class="check"><input type="checkbox" id="dupChkHidden">包含隐藏文件</label>
+          <label class="check"><input type="checkbox" id="dupChkEmpty" checked>忽略 0 字节文件</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="dot"></span>文件格式</div>
+      <div class="dup-card-intro">按文件内容找重复，不比较文件夹位置和文件名</div>
+      <div class="card-bd">
+        <div class="dup-format-grid">
+          <label class="dup-format selected">
+            <input type="radio" name="dupFormat" checked>
+            <div class="ft">TXT 文本</div>
+            <div class="fs">.txt 文件内容查重</div>
+          </label>
+          <label class="dup-format disabled">
+            <input type="radio" name="dupFormat" disabled>
+            <div class="ft">图片</div>
+            <div class="fs">后续迭代</div>
+          </label>
+          <label class="dup-format disabled">
+            <input type="radio" name="dupFormat" disabled>
+            <div class="ft">视频</div>
+            <div class="fs">后续迭代</div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="dot"></span>比对规则</div>
+      <div class="card-bd">
+        <label class="dup-rule selected">
+          <input type="radio" name="dupRule" checked>
+          <div><b>逐字节完全相同</b><span>先按大小预筛，再计算 SHA-256；结果确定，适合辅助清理。</span></div>
+        </label>
+        <label class="dup-rule disabled">
+          <input type="radio" name="dupRule" disabled>
+          <div><b>忽略换行符与 BOM 差异</b><span>文本规范化比较，属于后续增强项，可能产生近似判断。</span></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-bd">
+        <div class="start-wrap">
+          <button class="btn-start" id="btnDupStart">开始 TXT 查重</button>
+          <button class="btn" id="btnDupCancel" style="display:none;margin-left:10px">取消查重</button>
+        </div>
+        <div class="progress-wrap">
+          <div class="dup-phasebar">
+            <div class="dup-phase" id="dupPhase0">1. 枚举 TXT 文件</div>
+            <div class="dup-phase" id="dupPhase1">2. 按大小预筛</div>
+            <div class="dup-phase" id="dupPhase2">3. 计算内容哈希</div>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="dupProgFill"></div></div>
+          <div class="progress-meta">
+            <span class="scan-status" id="dupScanStatus">等待开始……</span>
+            <span class="pct" id="dupProgPct">0%</span>
+          </div>
+          <div class="progress-meta" style="margin-top:2px">
+            <span id="dupFileCount">已发现 0 个 TXT 文件</span>
+            <span id="dupCandidateCount">待比对 0 个候选</span>
+            <span id="dupFoundGroups">发现 0 组重复</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 标签四：TXT 查重结果 ============ -->
+  <section class="panel" id="panel-dupResult">
+    <div class="dup-metrics">
+      <div class="dup-metric"><div class="n" id="dupMetricGroups">0</div><div class="k">重复组</div></div>
+      <div class="dup-metric"><div class="n" id="dupMetricFiles">0</div><div class="k">可清理文件</div></div>
+      <div class="dup-metric"><div class="n" id="dupMetricSpace">0 KB</div><div class="k">可回收空间</div></div>
+      <button class="dup-metric dup-metric-link" id="btnDupSkipped" type="button" disabled title="查重完成后可查看失败文件">
+        <div class="n" id="dupMetricSkipped">0</div>
+        <div class="k">读取失败 / 跳过</div>
+        <span class="more" id="dupSkipHint">暂无明细</span>
+      </button>
+    </div>
+
+    <div class="card toolbar-card">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-ico">&#128269;</span>
+          <input class="textbox" id="dupTxtSearch" placeholder="搜索重复组中的文件名或路径">
+        </div>
+        <button class="btn" id="btnDupExpand">全部收起</button>
+        <button class="btn" id="btnDupRecommend">勾选当前页副本</button>
+        <button class="btn" id="btnDupClearSelection">清空选择</button>
+        <div class="spacer"></div>
+        <button class="btn danger" id="btnDupDelete" disabled>清理选中项</button>
+      </div>
+      <div class="dup-safe">&#128737; 安全规则：每个重复组至少保留 1 份；删除只移入回收站，不永久删除。</div>
+    </div>
+
+    <div class="card" style="margin-top:0">
+      <div class="dup-pagination">
+        <button class="btn" id="btnDupFirst">首页</button>
+        <button class="btn" id="btnDupPrev">上一页</button>
+        <span class="page-info">
+          第 <input class="textbox dup-page-input" id="dupPageInput" value="1"> / <span id="dupPageCount">1</span> 页
+          <span id="dupPageRange">显示 0–0 组</span>
+        </span>
+        <button class="btn" id="btnDupNext">下一页</button>
+        <button class="btn" id="btnDupLast">末页</button>
+        <select class="dup-page-size" id="dupPageSize" title="每页显示的重复组数量">
+          <option value="20" selected>每页 20 组</option>
+          <option value="50">每页 50 组</option>
+          <option value="100">每页 100 组</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="dupGroupList"></div>
+    <div class="dup-empty" id="dupEmptyState">
+      <div class="big">&#128269;</div>
+      <div>没有找到符合条件的重复文件</div>
+    </div>
+
+    <div class="dup-actionbar">
+      <div class="summary">已选择 <b id="dupSelCount">0</b> 个文件，预计回收 <b id="dupSelSpace">0 KB</b></div>
+      <div class="spacer"></div>
+      <span class="small muted">当前筛选共 <b id="dupFtGroups">0</b> 组 · <b id="dupFtFiles">0</b> 个可清理副本</span>
+    </div>
+  </section>
 </div>
 
 <!-- 删除确认弹层 -->
@@ -490,13 +695,43 @@ input,select{font-family:inherit}
   </div>
 </div>
 
+<!-- TXT 查重删除确认弹层 -->
+<div class="modal-mask" id="modalDupDelete">
+  <div class="modal">
+    <div class="modal-hd"><span class="warn">&#9888;&#65039;</span>确认清理重复文件</div>
+    <div class="modal-bd">
+      <div>将把 <b id="dupDelCount">0</b> 个文件移入回收站，预计回收 <b id="dupDelSpace">0 KB</b>。</div>
+      <div class="preview-list" id="dupDelPreview" style="max-height:180px"></div>
+      <div style="margin-top:10px;padding:10px 12px;background:var(--ok-bg);border:1px solid var(--ok-line);color:#166534;border-radius:8px;font-size:12.5px">每组仍会保留至少 1 份。清理后如发现判断有误，可从 Windows 回收站还原。</div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" id="btnDupCancelDelete">取消</button>
+      <button class="btn danger" id="btnDupConfirmDelete" style="background:var(--danger);color:#fff;border-color:var(--danger)">确认移入回收站</button>
+    </div>
+  </div>
+</div>
+
+<!-- TXT 查重失败 / 跳过明细弹层 -->
+<div class="modal-mask" id="modalDupSkipped">
+  <div class="modal dup-skip-modal" style="width:720px">
+    <div class="modal-hd">读取失败 / 跳过明细<span id="dupSkipModalCount" class="rn-hd-sub"></span></div>
+    <div class="modal-bd">
+      <div class="dup-skip-summary">这些文件未能完成读取或比对，不会参与重复组计算；其余文件的结果不受影响。</div>
+      <div class="dup-skip-list" id="dupSkipList"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" id="btnDupSkippedClose">关闭</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-zone" id="toastZone"></div>
 
 <script>
 'use strict';
 /* ================= 运行模式与通信层 ================= */
-console.log('[文件整理助手] UI 版本 2026-08-03-02');
-document.documentElement.setAttribute('data-ui-version', '2026-08-03-02');
+console.log('[文件整理助手] UI 版本 2026-11-21-03');
+document.documentElement.setAttribute('data-ui-version', '2026-11-21-03');
 var isWebView = !!(window.chrome && window.chrome.webview);
 var demoMode = !isWebView;
 var lastExportPath = '';
@@ -533,6 +768,11 @@ function handleHostMessage(msg){
     case 'export.overwrite': handleExportOverwrite(msg.payload); break;
     case 'export.result': handleExportResult(msg.payload); break;
     case 'operation.done': handleOperationDone(msg.payload); break;
+    case 'duplicate.scan.progress': dupHandleProgress(msg.payload); break;
+    case 'duplicate.scan.done': dupHandleDone(msg.payload); break;
+    case 'duplicate.scan.cancelled': dupHandleCancelled(msg.payload); break;
+    case 'duplicate.scan.error': dupHandleError(msg.payload); break;
+    case 'duplicate.delete.done': dupHandleDeleteDone(msg.payload); break;
     case 'toast': toast(msg.payload.message, msg.payload.kind); break;
     case 'error': toast(msg.payload.message, 'err'); break;
   }
@@ -618,7 +858,7 @@ function setTabDisabled(disabled){
 }
 document.querySelectorAll('.tab').forEach(function(t){
   t.addEventListener('click', function(){
-    if (t.disabled){ toast('扫描完成后可查看扫描结果', 'warn'); return; }
+    if (t.disabled){ toast(t.id === 'tabDupResult' ? '查重完成后可查看查重结果' : '扫描完成后可查看扫描结果', 'warn'); return; }
     switchTab(t.dataset.tab);
   });
 });
@@ -626,6 +866,7 @@ function switchTab(name){
   document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('active', x.dataset.tab===name); });
   document.querySelectorAll('.panel').forEach(function(x){ x.classList.toggle('active', x.id==='panel-'+name); });
   if (name==='result'){ requestAnimationFrame(renderRows); }
+  if (name==='dupResult'){ dupRenderGroups(); }
 }
 
 /* ================= 扫描配置 ================= */
@@ -1719,6 +1960,528 @@ function rebuildIndex(){
   tree = buildTreeFromFiles(allData, demoMode ? '' : $('txtFolder').value.trim());
   applyFilters(); renderFmt(); renderTiers(); renderTree();
 }
+
+/* ================= TXT 查重 ================= */
+var dupGroups = [];
+var dupSkippedFiles = [];
+var dupSkipped = 0;
+var dupPage = 1;
+var dupPageSize = 20;
+var dupSearchText = '';
+var dupCollapsed = false;
+var dupScanning = false;
+var dupDemoStartTimer = null;
+var dupDemoProgressTimer = null;
+
+function dupFormatSize(bytes){
+  if (bytes < 1024) return Math.max(0, Number(bytes) || 0).toLocaleString() + ' B';
+  var kb = bytes / 1024;
+  if (kb < 1024) return (Math.round(kb * 10) / 10).toLocaleString() + ' KB';
+  var mb = kb / 1024;
+  if (mb < 1024) return (Math.round(mb * 10) / 10).toLocaleString() + ' MB';
+  return (Math.round(mb / 1024 * 10) / 10).toLocaleString() + ' GB';
+}
+
+function dupFormatTime(value){
+  if (!value) return '';
+  var date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value).replace('T', ' ').substring(0, 16);
+  return date.toLocaleString('zh-CN', {
+    year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false
+  });
+}
+
+function dupSetPhase(index){
+  for (var i=0; i<3; i++){
+    var el = $('dupPhase' + i);
+    el.className = 'dup-phase' + (i < index ? ' done' : i === index ? ' active' : '');
+  }
+}
+
+function dupSetBusy(busy){
+  dupScanning = busy;
+  $('btnDupStart').disabled = busy;
+  $('btnDupBrowse').disabled = busy;
+  $('dupTxtFolder').disabled = busy;
+  $('dupChkHidden').disabled = busy;
+  $('dupChkEmpty').disabled = busy;
+  $('btnDupCancel').style.display = busy ? 'inline-block' : 'none';
+  if (busy){
+    $('tabDupResult').disabled = true;
+    $('tabDupResult').innerHTML = '查重结果<span class="lock">&#128274;</span>';
+  }
+}
+
+function dupSetResultReady(){
+  $('tabDupResult').disabled = false;
+  $('tabDupResult').textContent = '查重结果';
+  dupSetBusy(false);
+}
+
+function dupMapResult(payload){
+  var groups = ((payload && payload.groups) || []).map(function(group){
+    return {
+      hash: group.contentHash || group.hash || '',
+      files: (group.files || []).map(function(file){
+        return {
+          name: file.name || '',
+          path: file.fullPath || file.path || '',
+          size: Number(file.size) || 0,
+          time: dupFormatTime(file.lastWriteTime || file.time),
+          checked: false
+        };
+      }),
+      keep: 0
+    };
+  });
+  var skipped = ((payload && payload.skippedItems) || []).map(function(item){
+    return {
+      name: item.name || '',
+      path: item.fullPath || item.path || '',
+      reason: item.reason || '读取失败'
+    };
+  });
+  dupGroups = groups;
+  dupSkippedFiles = skipped;
+  dupSkipped = skipped.length;
+  dupPage = 1;
+  dupSearchText = '';
+  $('dupTxtSearch').value = '';
+  dupRenderGroups();
+}
+
+function dupRenderAll(){
+  dupRenderGroups();
+  dupUpdateSelection();
+}
+
+function dupGroupReclaim(group, keepIndex){
+  var keep = keepIndex === undefined ? group.keep : keepIndex;
+  return group.files.reduce(function(total, file, index){
+    return total + (index === keep ? 0 : file.size);
+  }, 0);
+}
+
+function dupSelectedFiles(){
+  var result = [];
+  dupGroups.forEach(function(group, groupIndex){
+    group.files.forEach(function(file, fileIndex){
+      if (file.checked && fileIndex !== group.keep){
+        result.push({ groupIndex:groupIndex, fileIndex:fileIndex, file:file });
+      }
+    });
+  });
+  return result;
+}
+
+function dupFilteredGroups(){
+  var keyword = dupSearchText.toLowerCase();
+  if (!keyword) return dupGroups;
+  return dupGroups.filter(function(group){
+    return group.files.some(function(file){
+      return (file.name + ' ' + file.path).toLowerCase().indexOf(keyword) >= 0;
+    });
+  });
+}
+
+function dupPageCount(filtered){
+  return Math.max(1, Math.ceil(filtered.length / dupPageSize));
+}
+
+function dupClampPage(){
+  var count = dupPageCount(dupFilteredGroups());
+  if (dupPage < 1) dupPage = 1;
+  if (dupPage > count) dupPage = count;
+}
+
+function dupUpdateMetrics(){
+  var cleanFiles = 0;
+  var reclaim = 0;
+  dupGroups.forEach(function(group){
+    cleanFiles += Math.max(0, group.files.length - 1);
+    reclaim += dupGroupReclaim(group);
+  });
+  $('dupMetricGroups').textContent = dupGroups.length.toLocaleString();
+  $('dupMetricFiles').textContent = cleanFiles.toLocaleString();
+  $('dupMetricSpace').textContent = dupFormatSize(reclaim);
+  $('dupMetricSkipped').textContent = dupSkipped.toLocaleString();
+  $('btnDupSkipped').disabled = dupSkipped === 0;
+  $('btnDupSkipped').title = dupSkipped ? '点击查看读取失败或跳过的文件' : '本次查重没有读取失败或跳过的文件';
+  $('dupSkipHint').textContent = dupSkipped ? '查看明细 →' : '暂无明细';
+}
+
+function dupUpdateSelection(){
+  var selected = dupSelectedFiles();
+  var space = selected.reduce(function(total, item){ return total + item.file.size; }, 0);
+  $('dupSelCount').textContent = selected.length.toLocaleString();
+  $('dupSelSpace').textContent = dupFormatSize(space);
+  $('btnDupDelete').disabled = selected.length === 0;
+}
+
+function dupRenderPagination(filtered){
+  var count = dupPageCount(filtered);
+  dupClampPage();
+  var start = filtered.length ? (dupPage - 1) * dupPageSize + 1 : 0;
+  var end = Math.min(filtered.length, dupPage * dupPageSize);
+  $('dupPageInput').value = dupPage;
+  $('dupPageCount').textContent = count.toLocaleString();
+  $('dupPageRange').textContent = '显示 ' + start.toLocaleString() + '–' + end.toLocaleString() + ' 组';
+  $('btnDupFirst').disabled = dupPage <= 1;
+  $('btnDupPrev').disabled = dupPage <= 1;
+  $('btnDupNext').disabled = dupPage >= count;
+  $('btnDupLast').disabled = dupPage >= count;
+  $('dupFtGroups').textContent = filtered.length.toLocaleString();
+  var cleanFiles = filtered.reduce(function(total, group){
+    return total + Math.max(0, group.files.length - 1);
+  }, 0);
+  $('dupFtFiles').textContent = cleanFiles.toLocaleString();
+}
+
+function dupRenderGroups(){
+  var filtered = dupFilteredGroups();
+  dupClampPage();
+  var start = (dupPage - 1) * dupPageSize;
+  var pageGroups = filtered.slice(start, start + dupPageSize);
+  var box = $('dupGroupList');
+  box.innerHTML = '';
+  $('dupEmptyState').style.display = filtered.length ? 'none' : 'block';
+
+  pageGroups.forEach(function(group){
+    var groupIndex = dupGroups.indexOf(group);
+    var card = document.createElement('div');
+    card.className = 'dup-group' + (dupCollapsed ? ' collapsed' : '');
+    var html = '<div class="dup-group-hd" data-dup-action="toggle">' +
+      '<span class="dup-chev">▼</span>' +
+      '<span class="dup-group-title">重复组 ' + (groupIndex + 1).toLocaleString() + '</span>' +
+      '<span class="dup-hash">SHA-256 ' + escapeHtml(group.hash.substring(0, 12)) + '…</span>' +
+      '<span class="dup-group-meta">' + group.files.length + ' 个相同文件 · 可回收 <b>' + dupFormatSize(dupGroupReclaim(group)) + '</b></span>' +
+      '</div><div class="dup-group-bd"><div class="dup-file-head"><span>保留</span><span>清理</span><span>文件位置</span><span>修改时间</span><span style="text-align:right">大小</span></div>';
+    group.files.forEach(function(file, fileIndex){
+      var isKeep = fileIndex === group.keep;
+      html += '<div class="dup-file-row ' + (isKeep ? 'keep' : (file.checked ? 'picked' : '')) + '">' +
+        '<span class="center"><input type="radio" name="dupKeep-' + groupIndex + '" data-dup-action="keep" data-g="' + groupIndex + '" data-f="' + fileIndex + '" ' + (isKeep ? 'checked' : '') + ' title="保留这一份"></span>' +
+        '<span class="center"><input type="checkbox" data-dup-action="check" data-g="' + groupIndex + '" data-f="' + fileIndex + '" ' + (file.checked ? 'checked' : '') + ' ' + (isKeep ? 'disabled' : '') + ' title="标记为可清理"></span>' +
+        '<div class="dup-file-main"><div class="dup-file-name">' + escapeHtml(file.name) + (isKeep ? '<span class="dup-keep-badge">将保留</span>' : file.checked ? '<span class="dup-pick-badge">待清理</span>' : '') + '</div>' +
+        '<div class="dup-file-path" title="' + escapeHtml(file.path) + '">' + escapeHtml(file.path) + '</div></div>' +
+        '<span class="dup-file-time">' + escapeHtml(file.time) + '</span><span class="dup-file-size">' + dupFormatSize(file.size) + '</span></div>';
+    });
+    card.innerHTML = html + '</div>';
+    box.appendChild(card);
+  });
+
+  dupUpdateMetrics();
+  dupRenderPagination(filtered);
+  dupUpdateSelection();
+}
+
+function dupRenderSkipped(){
+  $('dupSkipModalCount').textContent = ' · 共 ' + dupSkippedFiles.length.toLocaleString() + ' 项';
+  if (!dupSkippedFiles.length){
+    $('dupSkipList').innerHTML = '<div class="dup-skip-row"><div class="dup-skip-name">没有读取失败或跳过的文件</div></div>';
+    return;
+  }
+  $('dupSkipList').innerHTML = dupSkippedFiles.map(function(item){
+    return '<div class="dup-skip-row">' +
+      '<div class="dup-skip-top"><div class="dup-skip-name" title="' + escapeHtml(item.name) + '">' + escapeHtml(item.name) + '</div>' +
+      '<span class="dup-skip-reason">' + escapeHtml(item.reason) + '</span></div>' +
+      '<div class="dup-skip-path">' + escapeHtml(item.path) + '</div></div>';
+  }).join('');
+}
+
+function dupHandleProgress(progress){
+  if (!progress) return;
+  var percent = Number(progress.percent) || 0;
+  $('dupProgFill').style.width = percent + '%';
+  $('dupProgPct').textContent = Math.floor(percent) + '%';
+  $('dupScanStatus').textContent = progress.currentFile || (
+    progress.phase === 'Collecting' ? '正在枚举 TXT 文件…' :
+    progress.phase === 'Screening' ? '正在按文件大小预筛…' :
+    progress.phase === 'Hashing' ? '正在计算内容哈希…' : '查重完成'
+  );
+  $('dupFileCount').textContent = '已发现 ' + (Number(progress.fileCount) || 0).toLocaleString() + ' 个 TXT 文件';
+  $('dupCandidateCount').textContent = '候选 ' + (Number(progress.candidateCount) || 0).toLocaleString() + ' 个';
+  $('dupFoundGroups').textContent = '发现 ' + (Number(progress.groupCount) || 0).toLocaleString() + ' 组重复';
+  var phaseIndex = progress.phase === 'Collecting' ? 0 : progress.phase === 'Screening' ? 1 : progress.phase === 'Hashing' ? 2 : 3;
+  dupSetPhase(phaseIndex);
+}
+
+function dupHandleDone(payload){
+  payload = payload || {};
+  dupSetResultReady();
+  $('dupProgFill').style.width = '100%';
+  $('dupProgPct').textContent = '100%';
+  $('dupScanStatus').textContent = '查重完成';
+  $('dupFileCount').textContent = '已发现 ' + (Number(payload.fileCount) || 0).toLocaleString() + ' 个 TXT 文件';
+  $('dupCandidateCount').textContent = '比对 ' + (Number(payload.candidateCount) || 0).toLocaleString() + ' 个候选';
+  $('dupFoundGroups').textContent = '发现 ' + ((payload.groups || []).length).toLocaleString() + ' 组重复';
+  dupMapResult(payload);
+  switchTab('dupResult');
+  toast('TXT 查重完成，共发现 ' + dupGroups.length.toLocaleString() + ' 组重复文件', 'ok');
+}
+
+function dupHandleError(payload){
+  dupSetBusy(false);
+  $('tabDupResult').disabled = true;
+  $('tabDupResult').innerHTML = '查重结果<span class="lock">&#128274;</span>';
+  $('dupScanStatus').textContent = '查重失败';
+  toast((payload && payload.message) || 'TXT 查重失败', 'err');
+}
+
+function dupHandleCancelled(payload){
+  dupSetBusy(false);
+  $('tabDupResult').disabled = true;
+  $('tabDupResult').innerHTML = '查重结果<span class="lock">&#128274;</span>';
+  $('dupScanStatus').textContent = '已取消查重';
+  toast((payload && payload.message) || '已取消 TXT 查重', 'warn');
+}
+
+function dupStartScan(){
+  if (dupScanning) return;
+  var folder = $('dupTxtFolder').value.trim();
+  if (demoMode && !folder){
+    $('dupTxtFolder').value = 'D:\\演示目录';
+    folder = $('dupTxtFolder').value.trim();
+  }
+  if (!folder){ toast('请选择有效的目标文件夹。', 'err'); return; }
+
+  $('dupProgFill').style.width = '0%';
+  $('dupProgPct').textContent = '0%';
+  $('dupScanStatus').textContent = '正在准备查重…';
+  $('dupFileCount').textContent = '已发现 0 个 TXT 文件';
+  $('dupCandidateCount').textContent = '待比对 0 个候选';
+  $('dupFoundGroups').textContent = '发现 0 组重复';
+  dupSetPhase(0);
+  dupSetBusy(true);
+
+  if (demoMode){ dupStartDemoScan(); return; }
+  postToHost('duplicate.scan.start', {
+    folder: folder,
+    includeHidden: $('dupChkHidden').checked,
+    ignoreEmpty: $('dupChkEmpty').checked
+  });
+}
+
+function dupCancelScan(){
+  if (!dupScanning) return;
+  if (demoMode){
+    clearTimeout(dupDemoStartTimer);
+    clearInterval(dupDemoProgressTimer);
+    dupHandleCancelled({ message:'已取消 TXT 查重。' });
+    return;
+  }
+  postToHost('duplicate.scan.cancel');
+}
+
+function dupStartDemoScan(){
+  dupDemoStartTimer = setTimeout(function(){
+    var pct = 0;
+    dupDemoProgressTimer = setInterval(function(){
+      pct = Math.min(100, pct + 2.1 + Math.random() * 3.8);
+      dupHandleProgress({
+        phase: pct < 28 ? 'Collecting' : pct < 68 ? 'Screening' : 'Hashing',
+        percent: pct,
+        currentFile: pct < 30 ? 'D:\\演示目录\\历史资料\\会议纪要.txt' : '正在计算 SHA-256：项目周报.txt',
+        fileCount: Math.floor(12486 * Math.min(1, pct / 28)),
+        candidateCount: pct < 28 ? 0 : Math.floor(6218 * Math.min(1, (pct - 28) / 35)),
+        groupCount: pct < 68 ? 0 : Math.floor(5000 * Math.min(1, (pct - 68) / 32))
+      });
+      if (pct >= 100){
+        clearInterval(dupDemoProgressTimer);
+        dupDemoProgressTimer = null;
+        setTimeout(dupFinishDemoScan, 300);
+      }
+    }, 70);
+  }, 600);
+}
+
+function dupBuildDemoGroups(){
+  var result = [];
+  for (var i=0; i<5000; i++){
+    var count = 2 + (i % 4);
+    var size = 1024 + ((i * 7919) % (2 * 1024 * 1024));
+    var files = [];
+    for (var j=0; j<count; j++){
+      var base = ['会议纪要','项目周报','旅行账单','常用命令'][(i + j) % 4] + '_' + (1000 + i);
+      var name = j === 0 ? base + '.txt' : '副本_' + base + '.txt';
+      files.push({
+        name: name,
+        path: 'D:\\演示目录\\历史资料\\分组' + ((i % 20) + 1) + '\\' + name,
+        size: size,
+        time: '2025-11-03 09:' + String(10 + j).padStart(2, '0'),
+        checked: false
+      });
+    }
+    result.push({
+      hash: ((i * 2654435761) >>> 0).toString(16).padStart(8, '0') + ((i * 2246822519) >>> 0).toString(16).padStart(8, '0'),
+      files: files,
+      keep: 0
+    });
+  }
+  return result.sort(function(a, b){ return dupGroupReclaim(b) - dupGroupReclaim(a); });
+}
+
+function dupBuildDemoSkipped(){
+  var reasons = ['文件正被其他程序占用','没有读取权限','读取过程中文件发生变化','路径暂时不可访问','读取中断'];
+  return Array.from({length: 17}, function(_, index){
+    return {
+      name: '失败文件_' + (index + 1) + '.txt',
+      path: 'D:\\演示目录\\历史资料\\异常\\失败文件_' + (index + 1) + '.txt',
+      reason: reasons[index % reasons.length]
+    };
+  });
+}
+
+function dupFinishDemoScan(){
+  dupSetResultReady();
+  $('dupProgFill').style.width = '100%';
+  $('dupProgPct').textContent = '100%';
+  $('dupScanStatus').textContent = '查重完成';
+  $('dupFileCount').textContent = '已发现 12,486 个 TXT 文件';
+  $('dupCandidateCount').textContent = '比对 6,218 个大小相同的候选';
+  $('dupFoundGroups').textContent = '发现 5,000 组重复';
+  dupGroups = dupBuildDemoGroups();
+  dupSkippedFiles = dupBuildDemoSkipped();
+  dupSkipped = dupSkippedFiles.length;
+  dupPage = 1;
+  dupSearchText = '';
+  $('dupTxtSearch').value = '';
+  dupRenderGroups();
+  switchTab('dupResult');
+  toast('TXT 查重完成，共发现 5,000 组重复文件', 'ok');
+}
+
+function dupSetPage(page){
+  dupPage = page;
+  dupClampPage();
+  dupRenderGroups();
+}
+
+function dupRemoveDeletedPaths(paths){
+  var deletedSet = new Set(paths || []);
+  dupGroups = dupGroups.map(function(group){
+    var keepPath = group.files[group.keep] ? group.files[group.keep].path : '';
+    var files = group.files.filter(function(file){ return !deletedSet.has(file.path); });
+    var keep = files.findIndex(function(file){ return file.path === keepPath; });
+    return { hash:group.hash, files:files, keep:keep >= 0 ? keep : 0 };
+  }).filter(function(group){ return group.files.length > 1; });
+  dupRenderAll();
+}
+
+function dupHandleDeleteDone(payload){
+  payload = payload || {};
+  var deletedPaths = payload.deletedPaths || [];
+  var failed = payload.failed || [];
+  dupRemoveDeletedPaths(deletedPaths);
+  var message = '清理完成：成功 ' + (Number(payload.succeeded) || deletedPaths.length) + ' 个，跳过 ' + (Number(payload.skipped) || 0) + ' 个';
+  if (failed.length) message += '，失败 ' + failed.length + ' 个';
+  toast(message, failed.length ? 'warn' : 'ok');
+  failed.slice(0, 3).forEach(function(item){
+    toast('失败：' + item.path + '（' + item.reason + '）', 'err');
+  });
+}
+
+$('btnDupBrowse').addEventListener('click', function(){
+  browseFolder(function(path){ if (path) $('dupTxtFolder').value = path; });
+});
+$('btnDupStart').addEventListener('click', dupStartScan);
+$('btnDupCancel').addEventListener('click', dupCancelScan);
+$('dupTxtSearch').addEventListener('input', function(){
+  dupSearchText = this.value.trim();
+  dupPage = 1;
+  dupRenderGroups();
+});
+$('btnDupExpand').addEventListener('click', function(){
+  dupCollapsed = !dupCollapsed;
+  this.textContent = dupCollapsed ? '全部展开' : '全部收起';
+  dupRenderGroups();
+});
+$('btnDupRecommend').addEventListener('click', function(){
+  var filtered = dupFilteredGroups();
+  var start = (dupPage - 1) * dupPageSize;
+  filtered.slice(start, start + dupPageSize).forEach(function(group){
+    group.files.forEach(function(file, index){ file.checked = index !== group.keep; });
+  });
+  dupRenderGroups();
+  toast('已勾选当前页的非保留副本，请检查后再清理', 'warn');
+});
+$('btnDupClearSelection').addEventListener('click', function(){
+  dupGroups.forEach(function(group){ group.files.forEach(function(file){ file.checked = false; }); });
+  dupRenderGroups();
+  toast('已清空全部查重选择', 'ok');
+});
+$('btnDupSkipped').addEventListener('click', function(){
+  dupRenderSkipped();
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+  $('modalDupSkipped').classList.add('open');
+});
+$('btnDupSkippedClose').addEventListener('click', function(){
+  $('modalDupSkipped').classList.remove('open');
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+});
+$('dupGroupList').addEventListener('click', function(e){
+  var target = e.target.closest('[data-dup-action]');
+  if (!target) return;
+  var action = target.dataset.dupAction;
+  if (action === 'toggle'){
+    target.closest('.dup-group').classList.toggle('collapsed');
+    return;
+  }
+  var groupIndex = Number(target.dataset.g);
+  var fileIndex = Number(target.dataset.f);
+  var group = dupGroups[groupIndex];
+  if (action === 'keep' && target.checked){
+    group.files.forEach(function(file){ file.checked = false; });
+    group.keep = fileIndex;
+    dupRenderGroups();
+  } else if (action === 'check'){
+    group.files[fileIndex].checked = target.checked;
+    dupRenderGroups();
+  }
+});
+$('btnDupFirst').addEventListener('click', function(){ dupSetPage(1); });
+$('btnDupPrev').addEventListener('click', function(){ dupSetPage(dupPage - 1); });
+$('btnDupNext').addEventListener('click', function(){ dupSetPage(dupPage + 1); });
+$('btnDupLast').addEventListener('click', function(){ dupSetPage(dupPageCount(dupFilteredGroups())); });
+$('dupPageInput').addEventListener('change', function(){ dupSetPage(Number(this.value) || 1); });
+$('dupPageInput').addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); dupSetPage(Number(this.value) || 1); } });
+$('dupPageSize').addEventListener('change', function(){ dupPageSize = Number(this.value) || 20; dupPage = 1; dupRenderGroups(); });
+$('btnDupDelete').addEventListener('click', function(){
+  var selected = dupSelectedFiles();
+  if (!selected.length) return;
+  var space = selected.reduce(function(total, item){ return total + item.file.size; }, 0);
+  $('dupDelCount').textContent = selected.length.toLocaleString();
+  $('dupDelSpace').textContent = dupFormatSize(space);
+  var html = '';
+  selected.slice(0, 6).forEach(function(item){
+    html += '<div class="row-item">' + escapeHtml(item.file.path) + '</div>';
+  });
+  if (selected.length > 6) html += '<div class="row-item" style="color:#94a3b8">… 等共 ' + selected.length.toLocaleString() + ' 项</div>';
+  $('dupDelPreview').innerHTML = html;
+  $('modalDupDelete').classList.add('open');
+});
+$('btnDupCancelDelete').addEventListener('click', function(){ $('modalDupDelete').classList.remove('open'); });
+$('btnDupConfirmDelete').addEventListener('click', function(){
+  var selected = dupSelectedFiles();
+  if (!selected.length) return;
+  var files = selected.map(function(item){ return item.file.path; });
+  var keepPaths = dupGroups.map(function(group){
+    return group.files[group.keep] ? group.files[group.keep].path : '';
+  }).filter(Boolean);
+  $('modalDupDelete').classList.remove('open');
+
+  if (demoMode){
+    var count = files.length;
+    dupRemoveDeletedPaths(files);
+    toast('原型演示：已将 ' + count.toLocaleString() + ' 个文件移入回收站', 'ok');
+    return;
+  }
+
+  $('btnDupDelete').disabled = true;
+  toast('正在清理选中文件…', 'warn');
+  postToHost('duplicate.delete', { files:files, keepPaths:keepPaths });
+});
 
 /* ================= 全局错误捕获 ================= */
 window.addEventListener('error', function(e){

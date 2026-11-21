@@ -13,6 +13,7 @@ public class BridgeService
     private readonly FileScanner _scanner = new();
     private readonly FileOperations _fileOps = new();
     private readonly ExcelExporter _exporter = new();
+    private readonly DuplicateBridgeService _duplicateBridge;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -37,6 +38,7 @@ public class BridgeService
     public BridgeService(Action<string> send)
     {
         _send = send;
+        _duplicateBridge = new DuplicateBridgeService(Send);
     }
 
     /// <summary>
@@ -79,6 +81,15 @@ public class BridgeService
                     break;
                 case "file.delete":
                     await HandleDeleteAsync(payload);
+                    break;
+                case "duplicate.scan.start":
+                    await _duplicateBridge.StartAsync(payload);
+                    break;
+                case "duplicate.scan.cancel":
+                    _duplicateBridge.Cancel();
+                    break;
+                case "duplicate.delete":
+                    await _duplicateBridge.DeleteAsync(payload);
                     break;
                 default:
                     break;

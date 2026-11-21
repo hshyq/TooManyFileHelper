@@ -10,6 +10,9 @@
     <LongPathAware>true</LongPathAware>
     <RootNamespace>文件整理助手</RootNamespace>
     <AssemblyName>文件整理助手</AssemblyName>
+    <AssemblyTitle>文件整理助手</AssemblyTitle>
+    <Version>2.1.2</Version>
+    <FileVersion>2.1.2.0</FileVersion>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
 
@@ -21,5 +24,12 @@
   <ItemGroup>
     <EmbeddedResource Include="ui\index.html" />
   </ItemGroup>
+
+  <Target Name="RemoveUnneededWebView2Documentation" AfterTargets="Publish">
+    <ItemGroup>
+      <UnneededPublishFile Include="$(PublishDir)Microsoft.Web.WebView2.*.xml" />
+    </ItemGroup>
+    <Delete Files="@(UnneededPublishFile)" />
+  </Target>
 
 </Project>
