@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Windows.Forms;
 
 namespace 文件整理助手;
 
@@ -10,6 +11,7 @@ public sealed class DuplicateBridgeService
     private readonly Action<string, object?> _send;
     private readonly DuplicateScanner _scanner = new();
     private readonly FileOperations _fileOperations = new();
+    private readonly DuplicateSkippedExporter _skippedExporter = new();
 
     private DuplicateScanResult? _lastResult;
     private CancellationTokenSource? _scanCancellation;
@@ -39,9 +41,15 @@ public sealed class DuplicateBridgeService
         string folder = GetString(payload, "folder") ?? "";
         bool includeHidden = GetBool(payload, "includeHidden");
         bool ignoreEmpty = GetBool(payload, "ignoreEmpty");
+        int maxGroups = GetInt(payload, "maxGroups", 200);
         if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
         {
             Send("duplicate.scan.error", new { message = "请选择有效的目标文件夹。" });
+            return;
+        }
+        if (maxGroups <= 0)
+        {
+            Send("duplicate.scan.error", new { message = "最多重复组数必须是正整数。" });
             return;
         }
 
@@ -53,7 +61,13 @@ public sealed class DuplicateBridgeService
         {
             var progress = new Progress<DuplicateScanProgress>(OnProgress);
             var result = await Task.Run(
-                () => _scanner.ScanAsync(folder, includeHidden, ignoreEmpty, progress, cancellation.Token),
+                () => _scanner.ScanAsync(
+                    folder,
+                    includeHidden,
+                    ignoreEmpty,
+                    maxGroups,
+                    progress,
+                    cancellation.Token),
                 cancellation.Token);
 
             if (cancellation.IsCancellationRequested)
@@ -85,6 +99,9 @@ public sealed class DuplicateBridgeService
                 }).ToArray(),
                 fileCount = result.FileCount,
                 candidateCount = result.CandidateCount,
+                processedCandidateCount = result.ProcessedCandidateCount,
+                groupLimit = result.GroupLimit,
+                reachedGroupLimit = result.ReachedGroupLimit,
                 elapsedMs = result.ElapsedMs
             });
         }
@@ -193,6 +210,65 @@ public sealed class DuplicateBridgeService
         SendDeleteDone(operation.Succeeded, operation.Skipped, deletedPaths, failures);
     }
 
+    /// <summary>
+    /// 导出本次查重中被用户跳过的重复组。
+    /// </summary>
+    /// <param name="payload">包含 groups 数组，每组含 order、files 明细。</param>
+    public async Task ExportSkippedAsync(JsonElement payload)
+    {
+        var groups = ParseSkippedGroups(payload);
+        int fileCount = groups.Sum(group => group.Files.Count);
+        if (fileCount == 0)
+        {
+            Send("duplicate.skipped.export.done", new
+            {
+                ok = false,
+                message = "当前没有已跳过的重复组。"
+            });
+            return;
+        }
+
+        using var dialog = new SaveFileDialog
+        {
+            Title = "导出已跳过的重复组",
+            Filter = "Excel 工作簿 (*.xlsx)|*.xlsx",
+            DefaultExt = "xlsx",
+            AddExtension = true,
+            OverwritePrompt = true,
+            FileName = $"已跳过重复组_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+        };
+        if (dialog.ShowDialog() != DialogResult.OK)
+        {
+            Send("duplicate.skipped.export.done", new
+            {
+                ok = false,
+                cancelled = true,
+                message = "已取消导出。"
+            });
+            return;
+        }
+
+        try
+        {
+            await _skippedExporter.ExportAsync(groups, dialog.FileName);
+            Send("duplicate.skipped.export.done", new
+            {
+                ok = true,
+                path = dialog.FileName,
+                groupCount = groups.Count,
+                fileCount
+            });
+        }
+        catch (Exception ex)
+        {
+            Send("duplicate.skipped.export.done", new
+            {
+                ok = false,
+                message = "导出失败：" + ex.Message
+            });
+        }
+    }
+
     private void OnProgress(DuplicateScanProgress progress)
     {
         var now = DateTime.UtcNow;
@@ -299,6 +375,70 @@ public sealed class DuplicateBridgeService
                 {
                     result.Add(value);
                 }
+            }
+        }
+        return result;
+    }
+
+    private static int GetInt(JsonElement element, string name, int defaultValue)
+    {
+        return element.ValueKind == JsonValueKind.Object
+            && element.TryGetProperty(name, out var property)
+            && property.TryGetInt32(out int value)
+            ? value
+            : defaultValue;
+    }
+
+    private static long GetLong(JsonElement element, string name)
+    {
+        return element.ValueKind == JsonValueKind.Object
+            && element.TryGetProperty(name, out var property)
+            && property.TryGetInt64(out long value)
+            ? value
+            : 0;
+    }
+
+    private static List<DuplicateSkippedGroup> ParseSkippedGroups(JsonElement payload)
+    {
+        var result = new List<DuplicateSkippedGroup>();
+        if (payload.ValueKind != JsonValueKind.Object
+            || !payload.TryGetProperty("groups", out var groups)
+            || groups.ValueKind != JsonValueKind.Array)
+        {
+            return result;
+        }
+
+        foreach (var groupElement in groups.EnumerateArray())
+        {
+            var group = new DuplicateSkippedGroup
+            {
+                Order = GetInt(groupElement, "order", result.Count + 1),
+                ContentHash = GetString(groupElement, "contentHash") ?? ""
+            };
+            if (groupElement.TryGetProperty("files", out var files)
+                && files.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var fileElement in files.EnumerateArray())
+                {
+                    string? fullPath = GetString(fileElement, "fullPath")
+                        ?? GetString(fileElement, "path");
+                    if (string.IsNullOrWhiteSpace(fullPath))
+                    {
+                        continue;
+                    }
+
+                    group.Files.Add(new DuplicateFileEntry
+                    {
+                        Name = GetString(fileElement, "name") ?? Path.GetFileName(fullPath),
+                        FullPath = fullPath,
+                        Size = GetLong(fileElement, "size")
+                    });
+                }
+            }
+
+            if (group.Files.Count > 0)
+            {
+                result.Add(group);
             }
         }
         return result;

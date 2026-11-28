@@ -2,15 +2,22 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\..\src\DuplicateModels.cs" Link="DuplicateModels.cs" />
     <Compile Include="..\..\src\FileContentHasher.cs" Link="FileContentHasher.cs" />
     <Compile Include="..\..\src\DuplicateScanner.cs" Link="DuplicateScanner.cs" />
     <Compile Include="..\..\src\DuplicateBridgeService.cs" Link="DuplicateBridgeService.cs" />
+    <Compile Include="..\..\src\DuplicateSkippedExporter.cs" Link="DuplicateSkippedExporter.cs" />
     <Compile Include="..\..\src\FileOperations.cs" Link="FileOperations.cs" />
+    <Compile Include="..\..\src\FolderSafety.cs" Link="FolderSafety.cs" />
   </ItemGroup>
 </Project>

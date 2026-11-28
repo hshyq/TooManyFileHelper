@@ -2,33 +2,43 @@ namespace 文件整理助手;
 
 public class FileScanner
 {
-    public Task<List<FileEntry>> ScanAsync(
+    /// <summary>
+    /// 扫描文件，同时识别整棵子树都不含文件的无文件文件夹。
+    /// </summary>
+    /// <param name="rootPath">扫描根目录。</param>
+    /// <param name="includeHidden">是否把隐藏文件和隐藏文件夹下的文件加入扫描结果。</param>
+    /// <param name="progress">扫描进度回调。</param>
+    /// <param name="cancellationToken">取消令牌。</param>
+    /// <returns>文件和空文件夹候选集合。</returns>
+    public Task<ScanResult> ScanAsync(
         string rootPath,
         bool includeHidden,
         IProgress<ScanProgress> progress,
         CancellationToken cancellationToken)
     {
-        var allFiles = new List<string>();
+        var visibleFiles = new List<string>();
+        var emptyFolders = new List<FolderEntry>();
 
-        // 第一遍：收集所有文件路径
-        CollectFilePaths(rootPath, includeHidden, allFiles, progress, cancellationToken);
+        // 第一遍：收集可见文件，并审计所有目录（含隐藏目录）的真实文件情况。
+        CollectDirectory(
+            rootPath,
+            includeHidden,
+            includeInResults: true,
+            isRoot: true,
+            visibleFiles,
+            emptyFolders,
+            progress,
+            cancellationToken);
 
-        int total = allFiles.Count;
-
-        if (total == 0)
-        {
-            // 空目录：返回空列表，由 ExportAsync 生成仅有表头的 Excel
-            progress.Report(new ScanProgress(ScanPhase.Done, 100, "", 0, null));
-            return Task.FromResult(new List<FileEntry>());
-        }
-
-        // 第二遍：读取文件信息并报告进度
+        int total = visibleFiles.Count;
         var results = new List<FileEntry>(total);
-        for (int i = 0; i < allFiles.Count; i++)
+
+        // 第二遍：读取文件信息并报告进度。
+        for (int i = 0; i < total; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var fileInfo = new FileInfo(allFiles[i]);
+            var fileInfo = new FileInfo(visibleFiles[i]);
             results.Add(new FileEntry
             {
                 Name = fileInfo.Name,
@@ -45,15 +55,37 @@ public class FileScanner
         // 按路径排序（不区分大小写）
         results.Sort((a, b) =>
             string.Compare(a.FullPath, b.FullPath, StringComparison.OrdinalIgnoreCase));
+        emptyFolders.Sort((a, b) =>
+            string.Compare(a.FullPath, b.FullPath, StringComparison.OrdinalIgnoreCase));
 
         progress.Report(new ScanProgress(ScanPhase.Done, 100, "", results.Count, null));
-        return Task.FromResult(results);
+        return Task.FromResult(new ScanResult
+        {
+            Files = results,
+            EmptyFolders = emptyFolders
+        });
     }
 
-    private void CollectFilePaths(
+    /// <summary>
+    /// 目录子树文件状态。
+    /// </summary>
+    private enum SubtreeFileState
+    {
+        NoFiles,
+        HasFiles,
+        Unknown
+    }
+
+    /// <summary>
+    /// 递归收集可见文件，同时判断目录子树是否含任何真实文件。
+    /// </summary>
+    private SubtreeFileState CollectDirectory(
         string path,
         bool includeHidden,
-        List<string> results,
+        bool includeInResults,
+        bool isRoot,
+        List<string> visibleFiles,
+        List<FolderEntry> emptyFolders,
         IProgress<ScanProgress> progress,
         CancellationToken ct)
     {
@@ -61,37 +93,122 @@ public class FileScanner
         {
             var dirInfo = new DirectoryInfo(path);
             if (dirInfo.Attributes.HasFlag(FileAttributes.ReparsePoint))
-                return;
+                return SubtreeFileState.Unknown;
 
-            var options = BuildEnumerationOptions(includeHidden);
+            bool hasFiles = false;
+            bool hasUnknown = false;
+            var options = BuildEnumerationOptions();
 
-            foreach (var file in Directory.EnumerateFiles(path, "*", options))
+            foreach (var entry in Directory.EnumerateFileSystemEntries(path, "*", options))
             {
                 ct.ThrowIfCancellationRequested();
-                results.Add(file);
+
+                FileAttributes attributes;
+                try
+                {
+                    attributes = File.GetAttributes(entry);
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    hasUnknown = true;
+                    progress.Report(new ScanProgress(ScanPhase.Collecting, 0, "", 0, entry));
+                    continue;
+                }
+
+                if (attributes.HasFlag(FileAttributes.Directory))
+                {
+                    if (attributes.HasFlag(FileAttributes.ReparsePoint))
+                    {
+                        // 不跟随链接；父目录也无法确认为完全空目录。
+                        hasUnknown = true;
+                        continue;
+                    }
+
+                    bool childInResults = includeInResults && IsDirectoryIncluded(attributes, includeHidden);
+                    var childState = CollectDirectory(
+                        entry,
+                        includeHidden,
+                        childInResults,
+                        isRoot: false,
+                        visibleFiles,
+                        emptyFolders,
+                        progress,
+                        ct);
+                    if (childState == SubtreeFileState.HasFiles)
+                    {
+                        hasFiles = true;
+                    }
+                    else if (childState == SubtreeFileState.Unknown)
+                    {
+                        hasUnknown = true;
+                    }
+                }
+                else
+                {
+                    // 隐藏、系统等未进入结果列表的文件也按“存在文件”处理，确保不会误删。
+                    hasFiles = true;
+                    if (includeInResults && IsFileIncluded(attributes, includeHidden))
+                    {
+                        visibleFiles.Add(entry);
+                    }
+                }
             }
 
-            foreach (var dir in Directory.EnumerateDirectories(path, "*", options))
+            if (hasFiles)
+                return SubtreeFileState.HasFiles;
+            if (hasUnknown)
+                return SubtreeFileState.Unknown;
+
+            if (!isRoot)
             {
-                ct.ThrowIfCancellationRequested();
-                CollectFilePaths(dir, includeHidden, results, progress, ct);
+                emptyFolders.Add(new FolderEntry
+                {
+                    Name = dirInfo.Name,
+                    FullPath = dirInfo.FullName
+                });
             }
+            return SubtreeFileState.NoFiles;
         }
-        catch (UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             progress.Report(new ScanProgress(ScanPhase.Collecting, 0, "", 0, path));
+            return SubtreeFileState.Unknown;
         }
     }
 
-    private static EnumerationOptions BuildEnumerationOptions(bool includeHidden)
+    /// <summary>
+    /// 创建审计用枚举选项。审计时必须看到隐藏项，因此不跳过任何属性。
+    /// </summary>
+    private static EnumerationOptions BuildEnumerationOptions()
     {
         return new EnumerationOptions
         {
-            AttributesToSkip = includeHidden
-                ? FileAttributes.System
-                : FileAttributes.Hidden | FileAttributes.System,
+            AttributesToSkip = 0,
             RecurseSubdirectories = false,
-            IgnoreInaccessible = true
+            IgnoreInaccessible = false,
+            ReturnSpecialDirectories = false
         };
+    }
+
+    /// <summary>
+    /// 判断目录自身是否应进入可见扫描结果范围。
+    /// 系统目录始终排除；隐藏目录由“包含隐藏文件”开关控制。
+    /// </summary>
+    private static bool IsDirectoryIncluded(FileAttributes attributes, bool includeHidden)
+    {
+        if (attributes.HasFlag(FileAttributes.System))
+            return false;
+        return includeHidden || !attributes.HasFlag(FileAttributes.Hidden);
+    }
+
+    /// <summary>
+    /// 判断文件是否应进入可见扫描结果。
+    /// 系统文件始终排除；隐藏文件由“包含隐藏文件”开关控制。
+    /// </summary>
+    private static bool IsFileIncluded(FileAttributes attributes, bool includeHidden)
+    {
+        if (attributes.HasFlag(FileAttributes.System))
+            return false;
+        return includeHidden || !attributes.HasFlag(FileAttributes.Hidden);
     }
 }

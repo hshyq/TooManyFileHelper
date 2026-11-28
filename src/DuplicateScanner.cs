@@ -16,6 +16,7 @@ public sealed class DuplicateScanner
     /// <param name="rootPath">扫描根目录。</param>
     /// <param name="includeHidden">是否包含隐藏文件和隐藏目录。</param>
     /// <param name="ignoreEmpty">是否忽略 0 字节 TXT 文件。</param>
+    /// <param name="maxGroups">最多返回的重复组数，达到上限后停止继续哈希。</param>
     /// <param name="progress">查重进度。</param>
     /// <param name="cancellationToken">取消令牌。</param>
     /// <returns>重复组、失败项和统计信息。</returns>
@@ -23,9 +24,15 @@ public sealed class DuplicateScanner
         string rootPath,
         bool includeHidden,
         bool ignoreEmpty,
+        int maxGroups,
         IProgress<DuplicateScanProgress> progress,
         CancellationToken cancellationToken)
     {
+        if (maxGroups <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxGroups), "重复组数量上限必须是正整数。");
+        }
+
         var stopwatch = Stopwatch.StartNew();
         var skippedItems = new List<DuplicateSkippedItem>();
         var files = CollectTextFiles(
@@ -68,6 +75,9 @@ public sealed class DuplicateScanner
                 SortSkipped(skippedItems),
                 files.Count,
                 0,
+                0,
+                maxGroups,
+                false,
                 stopwatch.ElapsedMilliseconds);
         }
 
@@ -81,7 +91,9 @@ public sealed class DuplicateScanner
 
         long totalCandidateBytes = sizeGroups.Sum(file => file.Size);
         long processedBytes = 0;
+        int processedCandidateCount = 0;
         int duplicateGroupCount = 0;
+        bool reachedGroupLimit = false;
         var hashGroups = new Dictionary<string, List<DuplicateFileEntry>>(StringComparer.Ordinal);
 
         foreach (var file in sizeGroups)
@@ -129,6 +141,7 @@ public sealed class DuplicateScanner
                 if (groupFiles.Count == 2)
                 {
                     duplicateGroupCount++;
+                    reachedGroupLimit = duplicateGroupCount >= maxGroups;
                 }
 
                 processedBytes += fileBytesRead;
@@ -146,6 +159,7 @@ public sealed class DuplicateScanner
             }
             finally
             {
+                processedCandidateCount++;
                 int percent = totalCandidateBytes > 0
                     ? 25 + (int)Math.Min(73, processedBytes * 73 / totalCandidateBytes)
                     : 98;
@@ -156,6 +170,11 @@ public sealed class DuplicateScanner
                     files.Count,
                     sizeGroups.Count,
                     duplicateGroupCount));
+            }
+
+            if (reachedGroupLimit)
+            {
+                break;
             }
         }
 
@@ -190,6 +209,9 @@ public sealed class DuplicateScanner
             SortSkipped(skippedItems),
             files.Count,
             sizeGroups.Count,
+            processedCandidateCount,
+            maxGroups,
+            reachedGroupLimit,
             stopwatch.ElapsedMilliseconds);
     }
 

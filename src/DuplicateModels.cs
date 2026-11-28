@@ -82,4 +82,22 @@ public sealed record DuplicateScanResult(
     List<DuplicateSkippedItem> SkippedItems,
     int FileCount,
     int CandidateCount,
+    int ProcessedCandidateCount,
+    int GroupLimit,
+    bool ReachedGroupLimit,
     long ElapsedMs);
+
+/// <summary>
+/// 用户在当前查重结果中跳过的一组重复文件，用于导出。
+/// </summary>
+public sealed class DuplicateSkippedGroup
+{
+    /// <summary>跳过顺序，从 1 开始。</summary>
+    public int Order { get; set; }
+
+    /// <summary>重复组的 SHA-256。</summary>
+    public string ContentHash { get; set; } = "";
+
+    /// <summary>组内文件列表。</summary>
+    public List<DuplicateFileEntry> Files { get; set; } = [];
+}

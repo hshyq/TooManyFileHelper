@@ -14,6 +14,8 @@ public class BridgeService
     private readonly FileOperations _fileOps = new();
     private readonly ExcelExporter _exporter = new();
     private readonly DuplicateBridgeService _duplicateBridge;
+    private readonly FolderCleanupBridgeService _folderCleanupBridge;
+    private readonly ArchiveBridgeService _archiveBridge;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -21,6 +23,7 @@ public class BridgeService
     };
 
     private List<FileEntry>? _lastResult;
+    private string? _scanRoot;
     private readonly List<string> _skippedPaths = new();
     private readonly Stopwatch _scanStopwatch = new();
     private DateTime _lastProgressSent = DateTime.MinValue;
@@ -39,6 +42,8 @@ public class BridgeService
     {
         _send = send;
         _duplicateBridge = new DuplicateBridgeService(Send);
+        _folderCleanupBridge = new FolderCleanupBridgeService(Send);
+        _archiveBridge = new ArchiveBridgeService(Send);
     }
 
     /// <summary>
@@ -82,6 +87,15 @@ public class BridgeService
                 case "file.delete":
                     await HandleDeleteAsync(payload);
                     break;
+                case "folder.delete":
+                    await _folderCleanupBridge.DeleteAsync(payload, _scanRoot);
+                    break;
+                case "archive.extract":
+                    await _archiveBridge.StartAsync(payload, _scanRoot);
+                    break;
+                case "archive.cancel":
+                    _archiveBridge.Cancel();
+                    break;
                 case "duplicate.scan.start":
                     await _duplicateBridge.StartAsync(payload);
                     break;
@@ -90,6 +104,9 @@ public class BridgeService
                     break;
                 case "duplicate.delete":
                     await _duplicateBridge.DeleteAsync(payload);
+                    break;
+                case "duplicate.skipped.export":
+                    await _duplicateBridge.ExportSkippedAsync(payload);
                     break;
                 default:
                     break;
@@ -137,18 +154,21 @@ public class BridgeService
 
         _skippedPaths.Clear();
         _lastResult = null;
+        _scanRoot = null;
         _scanStopwatch.Restart();
 
         var progress = new Progress<ScanProgress>(OnScanProgress);
         try
         {
-            var files = await Task.Run(() => _scanner.ScanAsync(folder, includeHidden, progress, CancellationToken.None));
+            var scanResult = await Task.Run(() => _scanner.ScanAsync(folder, includeHidden, progress, CancellationToken.None));
             _scanStopwatch.Stop();
-            _lastResult = files;
+            _lastResult = scanResult.Files;
+            _scanRoot = Path.GetFullPath(folder);
 
             Send("scan.done", new
             {
-                files = files.Select(f => new { f.Name, f.Extension, f.FullPath, f.Size }).ToArray(),
+                files = scanResult.Files.Select(f => new { f.Name, f.Extension, f.FullPath, f.Size }).ToArray(),
+                folders = scanResult.EmptyFolders.Select(f => new { f.Name, f.FullPath }).ToArray(),
                 skippedPaths = _skippedPaths.ToArray(),
                 elapsedMs = _scanStopwatch.ElapsedMilliseconds,
                 exportRequested = _exportRequested,

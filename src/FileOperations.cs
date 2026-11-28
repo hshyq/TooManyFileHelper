@@ -33,6 +33,24 @@ public class FileOperations
     public record OperationResult(int Succeeded, int Skipped, List<FileFailure> Failed);
 
     /// <summary>
+    /// 单个跳过的文件夹。
+    /// </summary>
+    /// <param name="Path">文件夹路径</param>
+    /// <param name="Reason">跳过原因</param>
+    public record FolderSkip(string Path, string Reason);
+
+    /// <summary>
+    /// 批量删除文件夹的结果汇总。
+    /// </summary>
+    /// <param name="Succeeded">成功删除的顶层文件夹数量</param>
+    /// <param name="Skipped">跳过项</param>
+    /// <param name="Failed">失败项</param>
+    public record FolderDeletionResult(
+        int Succeeded,
+        List<FolderSkip> Skipped,
+        List<FileFailure> Failed);
+
+    /// <summary>
     /// 批量移动文件到目标文件夹（平铺：目标目录 + 原文件名）
     /// </summary>
     /// <param name="files">源文件完整路径列表</param>
@@ -185,6 +203,94 @@ public class FileOperations
 
             return new OperationResult(succeeded, skipped, failed);
         });
+    }
+
+    /// <summary>
+    /// 批量删除经扫描确认的无文件文件夹，默认移入回收站。
+    /// 每个顶层目录删除前都会重新检查整棵子树，隐藏文件同样计入。
+    /// </summary>
+    /// <param name="folders">待删除的顶层文件夹路径。</param>
+    /// <param name="scanRoot">本次扫描根目录，用于限制删除范围。</param>
+    /// <returns>文件夹删除结果。</returns>
+    public async Task<FolderDeletionResult> DeleteEmptyFoldersAsync(
+        IReadOnlyList<string> folders,
+        string scanRoot)
+    {
+        return await Task.Run(() =>
+        {
+            int succeeded = 0;
+            var skipped = new List<FolderSkip>();
+            var failed = new List<FileFailure>();
+
+            foreach (var folder in CollapseNestedPaths(folders))
+            {
+                try
+                {
+                    string fullPath = Path.GetFullPath(folder);
+                    string fullRoot = Path.GetFullPath(scanRoot);
+                    if (!FolderSafety.IsPathWithinRoot(fullRoot, fullPath) ||
+                        string.Equals(fullPath.TrimEnd(Path.DirectorySeparatorChar),
+                            fullRoot.TrimEnd(Path.DirectorySeparatorChar),
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        skipped.Add(new FolderSkip(folder, "文件夹不在本次扫描范围内"));
+                        continue;
+                    }
+
+                    if (!Directory.Exists(fullPath))
+                    {
+                        skipped.Add(new FolderSkip(folder, "文件夹已不存在"));
+                        continue;
+                    }
+
+                    var state = FolderSafety.Inspect(fullPath);
+                    if (state == FolderTreeFileState.HasFiles)
+                    {
+                        skipped.Add(new FolderSkip(folder, "目录中已出现文件，该目录及文件会被跳过"));
+                        continue;
+                    }
+                    if (state == FolderTreeFileState.Unknown)
+                    {
+                        skipped.Add(new FolderSkip(folder, "无法确认目录为空，已安全跳过"));
+                        continue;
+                    }
+
+                    FileSystem.DeleteDirectory(
+                        fullPath,
+                        UIOption.OnlyErrorDialogs,
+                        RecycleOption.SendToRecycleBin);
+                    succeeded++;
+                }
+                catch (Exception ex)
+                {
+                    failed.Add(new FileFailure(folder, ex.Message));
+                }
+            }
+
+            return new FolderDeletionResult(succeeded, skipped, failed);
+        });
+    }
+
+    /// <summary>
+    /// 去除已被父目录覆盖的子目录，避免重复删除。
+    /// </summary>
+    private static List<string> CollapseNestedPaths(IReadOnlyList<string> folders)
+    {
+        var normalized = folders
+            .Where(path => !string.IsNullOrWhiteSpace(path))
+            .Select(Path.GetFullPath)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(path => path.Length)
+            .ToList();
+
+        var result = new List<string>();
+        foreach (var path in normalized)
+        {
+            if (result.Any(parent => FolderSafety.IsPathWithinRoot(parent, path)))
+                continue;
+            result.Add(path);
+        }
+        return result;
     }
 
     /// <summary>

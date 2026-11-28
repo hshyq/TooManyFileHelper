@@ -59,6 +59,8 @@ input,select{font-family:inherit}
 .btn.primary:disabled{background:#93c5fd;border-color:#93c5fd;cursor:not-allowed;box-shadow:none}
 .btn.danger{background:#fff;border-color:var(--danger-line);color:var(--danger)}
 .btn.danger:hover{background:var(--danger-bg)}
+.btn.danger-solid{background:var(--danger);border-color:var(--danger);color:#fff;font-weight:600;box-shadow:0 2px 6px rgba(220,38,38,.22)}
+.btn.danger-solid:hover{background:#b91c1c;border-color:#b91c1c}
 .check{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-size:13.5px}
 .check input{width:16px;height:16px;accent-color:var(--primary);cursor:pointer}
 
@@ -99,6 +101,10 @@ input,select{font-family:inherit}
 .drop-panel .dp-ft{padding:8px 12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
 .toolbar .spacer{flex:1}
 .batch-ops{display:flex;gap:8px}
+.folder-audit-btn{display:inline-flex;align-items:center;gap:7px}
+.folder-audit-btn .folder-count{min-width:22px;height:20px;padding:0 7px;border-radius:999px;background:#e2e8f0;color:#475569;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.folder-audit-btn.has-items{border-color:var(--primary-line);background:var(--primary-bg);color:var(--primary)}
+.folder-audit-btn.has-items .folder-count{background:var(--primary);color:#fff}
 
 /* 树 */
 .tree-search{margin:0;padding:10px 12px;border-bottom:1px solid var(--line);display:flex;gap:8px}
@@ -149,6 +155,17 @@ input,select{font-family:inherit}
 .grid-row .cell.size{color:#475569;font-variant-numeric:tabular-nums;text-align:right}
 .grid-row.selected-row{background:var(--primary-bg)}
 
+/* 扫描结果页：窗口内固定头部/工具栏/表头/底部统计，仅数据区滚动 */
+body.result-layout{overflow:hidden}
+body.result-layout .app{height:100vh;display:flex;flex-direction:column;padding-bottom:16px}
+body.result-layout .app-header{flex:none}
+body.result-layout #panel-result.active{display:flex;flex:1;min-height:0;flex-direction:column}
+body.result-layout #panel-result .toolbar-card{flex:none;margin-bottom:16px}
+body.result-layout #panel-result .table-card{display:flex;flex:1;min-height:0;flex-direction:column;margin-bottom:0}
+body.result-layout #panel-result .grid-head,
+body.result-layout #panel-result .table-ft{flex:none}
+body.result-layout #panel-result .vlist{flex:1;height:auto;min-height:0}
+
 /* 底部统计 */
 .table-ft{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
 .table-ft b{color:var(--text);font-variant-numeric:tabular-nums}
@@ -168,6 +185,8 @@ input,select{font-family:inherit}
 .modal-bd .preview-list{margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--text);background:#f8fafc}
 .modal-bd .preview-list .row-item{padding:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .modal-ft{padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px}
+.modal-close{width:30px;height:30px;margin-left:auto;border:0;border-radius:8px;background:transparent;color:#94a3b8;font-size:20px;line-height:1}
+.modal-close:hover{background:#f1f5f9;color:#475569}
 .rule-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px}
 .rule-row label{width:64px;text-align:right;color:#475569;flex:none}
 .rule-row .textbox{flex:1}
@@ -240,6 +259,10 @@ input,select{font-family:inherit}
 .dup-rule.selected{border-color:var(--primary);background:var(--primary-bg)}.dup-rule input{width:16px;height:16px;margin-top:2px;accent-color:var(--primary)}
 .dup-rule b{display:block;font-size:13.5px}.dup-rule span{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
 .dup-rule.disabled{opacity:.58;cursor:not-allowed}
+.dup-start-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.dup-limit-field{display:flex;align-items:center;gap:7px;font-size:13px;color:#475569}
+.dup-limit-input{width:88px;height:34px;border:1px solid var(--line);border-radius:8px;background:#fff;text-align:center;font-size:13.5px;color:var(--text);outline:none}
+.dup-limit-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
 .dup-phasebar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
 .dup-phase{padding:8px 10px;border-radius:8px;background:#f8fafc;border:1px solid var(--line);font-size:12px;color:#64748b}
 .dup-phase.active{color:var(--primary);border-color:var(--primary-line);background:var(--primary-bg);font-weight:650}
@@ -258,6 +281,8 @@ input,select{font-family:inherit}
 .dup-chev{width:20px;color:#64748b;transition:transform .15s}.dup-group.collapsed .dup-chev{transform:rotate(-90deg)}
 .dup-group.collapsed .dup-group-bd{display:none}.dup-group-title{font-weight:700;font-size:13.5px}
 .dup-group-meta{margin-left:auto;color:var(--muted);font-size:12px;text-align:right}.dup-group-meta b{color:var(--danger)}
+.dup-skip-group{height:28px;border:1px solid var(--line);border-radius:7px;background:#fff;color:#64748b;padding:0 10px;font-size:12px;flex:none}
+.dup-skip-group:hover{border-color:#cbd5e1;background:#f8fafc;color:#334155}
 .dup-hash{font-size:11.5px;font-family:Consolas,monospace;color:#64748b;background:#eef2f7;padding:2px 7px;border-radius:5px}
 .dup-file-head,.dup-file-row{display:grid;grid-template-columns:64px 58px minmax(0,1fr) 138px 88px;align-items:center;gap:8px}
 .dup-file-head{height:34px;padding:0 16px;border-bottom:1px solid #f1f5f9;font-size:11.5px;color:#94a3b8}
@@ -276,6 +301,7 @@ input,select{font-family:inherit}
 .dup-page-size{height:32px;border:1px solid var(--line);border-radius:8px;padding:0 8px;background:#fff;color:#475569}
 .dup-actionbar{position:sticky;bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px;padding:13px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.96);box-shadow:0 10px 30px rgba(15,23,42,.12);backdrop-filter:blur(8px)}
 .dup-actionbar .summary{font-size:13px;color:#475569}.dup-actionbar b{color:var(--text)}
+.dup-actionbar .dup-delete-cta{height:38px;padding:0 20px}
 .dup-empty{display:none;padding:60px 20px;text-align:center;color:#94a3b8}.dup-empty .big{font-size:34px;margin-bottom:8px}
 .dup-skip-summary{padding:10px 12px;border:1px solid #fde68a;background:#fffbeb;color:#854d0e;border-radius:9px;font-size:12.5px;margin-bottom:12px}
 .dup-skip-list{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:10px}
@@ -288,6 +314,88 @@ input,select{font-family:inherit}
 .dup-skip-modal .modal-bd{max-height:none;min-height:0;flex:1;overflow:hidden;display:flex;flex-direction:column}
 .dup-skip-modal .dup-skip-summary{flex:none}.dup-skip-modal .dup-skip-list{max-height:none;min-height:0;flex:1;overflow-y:auto;overflow-x:hidden}
 @media(max-width:850px){.dup-format-grid{grid-template-columns:1fr}.dup-metrics{grid-template-columns:repeat(2,1fr)}.dup-checks{margin-left:0}.dup-file-head,.dup-file-row{grid-template-columns:54px 48px minmax(0,1fr) 80px}.dup-file-head span:nth-child(4),.dup-file-row .dup-file-time{display:none}}
+
+/* ===== 批量改名性能优化 ===== */
+.table-card{overflow:visible}
+.grid-head,.grid-row{grid-template-columns:86px minmax(180px,1.4fr) 100px minmax(260px,2fr) 110px}
+.select-preset-wrap{display:flex;align-items:center;gap:4px;position:relative}
+.select-preset-caret{width:24px;height:24px;border:1px solid var(--line);border-radius:6px;background:#fff;color:#64748b;font-size:10px;padding:0}
+.select-preset-caret:hover{border-color:#cbd5e1;background:#fff}
+.select-preset-panel{left:0;right:auto;min-width:250px}
+.select-preset-panel .dp-body{display:flex;flex-direction:column;gap:2px}
+.select-preset-item{border:0;background:#fff;text-align:left;padding:8px 10px;border-radius:7px;font-size:12.5px;color:#334155}
+.select-preset-item:hover{background:var(--primary-bg);color:var(--primary)}
+.rename-mode-panel{left:auto;right:0;min-width:320px}
+.rename-mode-item{display:block;width:100%;border:0;background:#fff;text-align:left;padding:10px;border-radius:8px}
+.rename-mode-item:hover{background:var(--primary-bg)}.rename-mode-item b{display:block;font-size:13px;color:#1e293b}.rename-mode-item small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.rename-mode-item.all{border:1px solid var(--primary-line);background:#f8fbff}
+.rn-mode-summary{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:12px;border:1px solid var(--primary-line);background:var(--primary-bg);border-radius:9px;color:#1e40af;font-size:12.5px}
+.rn-mode-summary b{font-size:13px}.rn-mode-summary .order{margin-left:auto;color:#475569}
+.rn-analysis-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px dashed #cbd5e1;border-radius:9px;background:#f8fafc;margin-bottom:10px}
+.rn-analysis-status{font-size:12.5px;color:var(--muted)}.rn-progress{height:7px;flex:1;min-width:150px;background:#e2e8f0;border-radius:999px;overflow:hidden}
+.rn-progress i{display:block;height:100%;width:0;background:var(--primary);transition:width .12s}
+.rn-pager{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted)}
+.rn-page-btn{height:28px;border:1px solid var(--line);background:#fff;border-radius:7px;padding:0 9px;font-size:12px;color:#475569}
+.rn-preview-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}.rn-preview-tools select{height:30px;border:1px solid var(--line);border-radius:7px;padding:0 8px;background:#fff;font-size:12px}
+.rn-preview-meta{margin-left:auto;color:var(--muted);font-size:12px}
+.rn-conflict-row{color:var(--danger)}
+
+/* ===== 空文件夹清理 ===== */
+.empty-folder-modal{width:760px;max-width:94vw;height:min(82vh,760px);display:flex;flex-direction:column}
+.empty-folder-modal .modal-bd{max-height:none;min-height:0;flex:1;display:flex;flex-direction:column;overflow:hidden;padding:0}
+.empty-folder-summary{margin:16px 20px 12px;padding:11px 13px;border:1px solid var(--primary-line);border-radius:10px;background:var(--primary-bg);color:#1e40af;font-size:12.5px;line-height:1.7}
+.empty-folder-summary b{font-size:13px}
+.empty-folder-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 20px 12px;border-bottom:1px solid var(--line)}
+.empty-folder-toolbar .search-wrap{min-width:220px}
+.empty-folder-toolbar .search-wrap input{height:32px}
+.empty-folder-toolbar .btn{height:32px}
+.empty-folder-list{min-height:0;flex:1;overflow:auto;padding:6px 20px 16px}
+.empty-folder-row{display:flex;align-items:center;gap:7px;min-height:38px;padding:4px 7px;border-radius:8px;font-size:13px}
+.empty-folder-row:hover{background:#f8fafc}
+.empty-folder-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--primary);flex:none;cursor:pointer}
+.empty-folder-row .toggle{width:20px;height:24px;border:0;background:transparent;color:#94a3b8;font-size:10px;padding:0;flex:none}
+.empty-folder-row .toggle.placeholder{cursor:default}
+.empty-folder-row .folder-icon{font-size:14px;flex:none}
+.empty-folder-row .folder-name{font-weight:600;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty-folder-row .folder-derived{margin-left:auto;color:var(--muted);font-size:11.5px;white-space:nowrap;padding-left:10px}
+.empty-folder-empty{padding:48px 20px;text-align:center;color:#94a3b8;font-size:13px}
+.empty-folder-ft{display:flex;align-items:center;gap:12px;padding:13px 20px;border-top:1px solid var(--line);background:#fff;flex-wrap:wrap}
+.empty-folder-ft .summary{font-size:12.5px;color:#475569;line-height:1.55}
+.empty-folder-ft .summary b{color:var(--text)}
+.empty-folder-ft .actions{margin-left:auto;display:flex;gap:8px}
+.empty-folder-confirm-list{margin-top:10px;max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:#f8fafc;padding:8px 10px;font-size:12px}
+.empty-folder-confirm-list .row-item{padding:3px 0;word-break:break-all}
+.danger-note{border:1px solid var(--danger-line);background:var(--danger-bg);color:#991b1b;border-radius:9px;padding:9px 11px;margin-top:12px;font-size:12.5px}
+
+/* ===== 批量解压 ===== */
+.extract-modal{width:720px;max-width:94vw;height:min(80vh,720px);display:flex;flex-direction:column}
+.extract-modal .modal-bd{max-height:none;min-height:0;flex:1;display:flex;flex-direction:column;overflow:hidden;padding:0}
+.extract-intro{margin:16px 20px 10px;padding:11px 13px;border:1px solid #fde68a;background:#fffbeb;color:#854d0e;border-radius:10px;font-size:12.5px;line-height:1.7}
+.extract-intro b{color:#713f12}
+.extract-summary{padding:0 20px 10px;color:#475569;font-size:12.5px}
+.extract-preview{min-height:120px;max-height:260px;overflow:auto;margin:0 20px 12px;border:1px solid var(--line);border-radius:9px;background:#f8fafc}
+.extract-row{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,.9fr);gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid #edf1f6;font-size:12px}
+.extract-row:last-child{border-bottom:0}
+.extract-row .from,.extract-row .to{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.extract-row .from{color:#334155}.extract-row .to{color:var(--primary)}
+.extract-row .arrow{text-align:center;color:#94a3b8}
+.extract-options{margin:0 20px 12px;padding:11px 12px;border:1px solid var(--line);border-radius:9px}
+.extract-options .title{font-size:12.5px;color:#475569;margin-bottom:8px}
+.extract-options .opts{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.extract-options label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#334155}
+.extract-options input{accent-color:var(--primary)}
+.extract-progress{margin:0 20px 16px;padding:12px;border:1px solid var(--line);border-radius:9px;background:#fff}
+.extract-progress .meta{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.extract-progress .meta b{color:var(--text)}
+.extract-done-note{padding:12px 13px;border:1px solid var(--ok-line);background:var(--ok-bg);border-radius:9px;color:#166534;font-size:12.5px;line-height:1.7}
+.extract-modal .modal-ft{flex:none}
+
+@media(max-width:640px){
+  .empty-folder-modal,.extract-modal{height:90vh}
+  .empty-folder-row .folder-derived{display:none}
+  .extract-row{grid-template-columns:1fr;gap:2px}
+  .extract-row .arrow{display:none}
+}
 </style>
 </head>
 <body>
@@ -304,7 +412,7 @@ input,select{font-family:inherit}
   <rect width="100" height="100" rx="22" fill="url(#logoGrad)"/>
   <g transform="translate(11.6 10.5)"><path d="M57.0994 3.6C57.0994 1.615 55.4834 0 53.4994 0C51.5154 0 49.8994 1.615 49.8994 3.6C49.8994 5.585 51.5154 7.2 53.4994 7.2C55.4834 7.2 57.0994 5.585 57.0994 3.6ZM51.8994 3.6C51.8994 4.482 52.6174 5.2 53.4994 5.2C54.3814 5.2 55.0994 4.482 55.0994 3.6C55.0994 2.718 54.3814 2 53.4994 2C52.6174 2 51.8994 2.718 51.8994 3.6ZM37.4994 8.2C43.0224 8.2 47.4994 12.677 47.4994 18.2C47.4994 23.723 43.0224 28.2 37.4994 28.2C31.9764 28.2 27.4994 23.723 27.4994 18.2C27.4994 12.677 31.9764 8.2 37.4994 8.2ZM35.2894 21.81L32.5894 19.11C32.1984 18.72 32.1984 18.08 32.5894 17.69C32.9804 17.3 33.6194 17.3 34.0094 17.69L35.9994 19.69L40.9894 14.69C41.3804 14.3 42.0194 14.3 42.4094 14.69C42.8004 15.081 42.8004 15.72 42.4094 16.11L36.7094 21.81C36.3184 22.201 35.6794 22.201 35.2894 21.81ZM18.6282 21.5358C19.0842 21.9528 19.1582 22.4528 19.1582 22.7958C19.1582 23.3048 18.9362 23.8128 18.5582 24.2258C18.1842 24.6328 18.2212 25.2628 18.6282 25.6358C18.8202 25.8118 19.0572 25.8958 19.2982 25.8958C19.5692 25.8958 19.8422 25.7908 20.0382 25.5758C20.7472 24.8028 21.1422 23.8238 21.1582 22.8258C21.1762 21.7598 20.7622 20.7838 19.9782 20.0658C18.3832 18.6058 15.9662 18.6168 14.4882 20.0958C14.0972 20.4868 14.0972 21.1148 14.4882 21.5058C14.8792 21.8968 15.5182 21.8958 15.9082 21.5058C16.6292 20.7868 17.8252 20.7998 18.6282 21.5358ZM53.5095 30.7094C53.0645 30.3834 52.9635 29.7544 53.2895 29.3094L56.2895 25.2094C56.6135 24.7644 57.2415 24.6634 57.6895 24.9894C58.1345 25.3154 58.2355 25.9444 57.9095 26.3894L54.9095 30.4894C54.7135 30.7574 54.4085 30.8994 54.0995 30.8994C53.8945 30.8994 53.6885 30.8394 53.5095 30.7094ZM66.5303 37.229C66.5693 37.272 66.6083 37.309 66.6403 37.359L76.6403 52.959C76.8373 53.268 76.8563 53.659 76.6803 53.979C76.5053 54.301 76.1653 54.499 75.8003 54.499L66.8003 54.499L66.8003 77.899C66.8003 78.452 66.3533 78.899 65.8003 78.899L11.0003 78.899C10.4483 78.899 10.0003 78.452 10.0003 77.899L10.0003 54.499L1.00034 54.499C0.634336 54.499 0.295336 54.3 0.120336 53.979C-0.0546643 53.658 -0.0366643 53.268 0.160336 52.959L10.1603 37.359C10.1923 37.308 10.2303 37.272 10.2703 37.229C10.2823 37.216 10.2873 37.191 10.3003 37.179C10.3813 37.1 10.4783 37.046 10.5803 36.999C10.6033 36.988 10.6263 36.969 10.6503 36.969C10.7603 36.928 10.8793 36.899 11.0003 36.899L65.8003 36.899C65.9213 36.899 66.0403 36.928 66.1503 36.969C66.1753 36.969 66.1963 36.988 66.2203 36.999C66.3213 37.046 66.4193 37.1 66.5003 37.179C66.5133 37.192 66.5183 37.216 66.5303 37.229ZM21.8503 52.499L2.83034 52.499L11.5503 38.899L30.5703 38.899L21.8503 52.499ZM65.2503 38.899L73.9703 52.499L42.9503 52.499L34.2303 38.899L65.2503 38.899ZM12.0003 76.519L12.0003 54.499L22.4003 54.499C22.7413 54.499 23.0563 54.325 23.2403 54.039L31.4003 41.309L31.4003 67.279L12.0003 76.519ZM42.4003 54.499L64.8003 54.499L64.8003 76.899L33.4003 76.899L33.4003 41.309L41.5603 54.039C41.7443 54.325 42.0593 54.499 42.4003 54.499ZM61.7994 73.9L52.0994 73.9L52.0994 69.6L61.7994 69.6L61.7994 73.9Z" fill-rule="evenodd" fill="#ffffff"/></g>
 </svg></div>
-      <div class="title">文件整理助手<span class="ver">v2.1.2</span></div>
+      <div class="title">文件整理助手<span class="ver">v2.2.0</span></div>
     </div>
     <nav class="tabs">
       <button class="tab active" data-tab="scan">扫描配置</button>
@@ -412,11 +520,22 @@ input,select{font-family:inherit}
         </div>
 
         <button class="btn" id="btnClearAll">清除筛选</button>
+        <button class="btn folder-audit-btn" id="btnEmptyFolders" type="button" title="查看整棵子树都不含文件的文件夹">
+          <span>无文件文件夹</span><span class="folder-count" id="emptyFolderCount">0</span>
+        </button>
 
         <div class="spacer"></div>
         <div class="batch-ops">
           <button class="btn" id="btnMove">移动到…</button>
-          <button class="btn" id="btnRename">批量改名</button>
+          <button class="btn" id="btnExtract" type="button" title="仅处理勾选中的压缩文件">批量解压</button>
+          <div class="dropdown" id="ddRenameMode">
+            <button class="btn" id="btnRename"><span class="btn-label">批量改名</span> <span class="caret">&#9662;</span></button>
+            <div class="drop-panel rename-mode-panel" id="panelRenameMode">
+              <div class="dp-hd">选择改名模式</div>
+              <div class="dp-body" id="renameModeList"></div>
+              <div class="dp-ft">后续新增规则会自动加入列表和“全部规则”。</div>
+            </div>
+          </div>
           <button class="btn danger" id="btnDelete">删除到回收站</button>
         </div>
       </div>
@@ -424,7 +543,20 @@ input,select{font-family:inherit}
 
     <div class="card table-card">
       <div class="grid-head">
-        <span class="col-check"><input type="checkbox" id="chkAll" title="全选/取消全选（当前筛选结果）"></span>
+        <span class="select-preset-wrap dropdown" id="ddSelectPreset">
+          <input type="checkbox" id="chkAll" title="全选/取消全选（当前筛选结果）">
+          <button class="select-preset-caret" id="btnSelectPreset" title="按数量选择">&#9662;</button>
+          <div class="drop-panel select-preset-panel" id="panelSelectPreset">
+            <div class="dp-hd">选择当前筛选结果<span class="clear-link" id="clearSelection">清空</span></div>
+            <div class="dp-body">
+              <button class="select-preset-item" data-select-count="30">选择前 30 个</button>
+              <button class="select-preset-item" data-select-count="50">选择前 50 个</button>
+              <button class="select-preset-item" data-select-count="100">选择前 100 个</button>
+              <button class="select-preset-item" data-select-count="visible">选择当前可见范围</button>
+              <button class="select-preset-item" data-select-count="all">全选当前筛选结果</button>
+            </div>
+          </div>
+        </span>
         <span class="col-sortable" data-key="name">文件名称 <span class="sort-ico" id="sortName">↕</span></span>
         <span class="col-sortable" data-key="ext">格式 <span class="sort-ico" id="sortExt">↕</span></span>
         <span class="col-sortable" data-key="path">所在全路径 <span class="sort-ico" id="sortPath">↕</span></span>
@@ -502,7 +634,10 @@ input,select{font-family:inherit}
 
     <div class="card">
       <div class="card-bd">
-        <div class="start-wrap">
+        <div class="start-wrap dup-start-row">
+          <label class="dup-limit-field">最多重复组
+            <input class="dup-limit-input" id="dupMaxGroups" type="text" inputmode="numeric" pattern="[0-9]*" value="200" title="填写正整数，达到该数量后停止查重">
+          </label>
           <button class="btn-start" id="btnDupStart">开始 TXT 查重</button>
           <button class="btn" id="btnDupCancel" style="display:none;margin-left:10px">取消查重</button>
         </div>
@@ -549,8 +684,7 @@ input,select{font-family:inherit}
         <button class="btn" id="btnDupExpand">全部收起</button>
         <button class="btn" id="btnDupRecommend">勾选当前页副本</button>
         <button class="btn" id="btnDupClearSelection">清空选择</button>
-        <div class="spacer"></div>
-        <button class="btn danger" id="btnDupDelete" disabled>清理选中项</button>
+        <button class="btn" id="btnDupExportSkipped" disabled>导出已跳过 (0)</button>
       </div>
       <div class="dup-safe">&#128737; 安全规则：每个重复组至少保留 1 份；删除只移入回收站，不永久删除。</div>
     </div>
@@ -583,6 +717,7 @@ input,select{font-family:inherit}
       <div class="summary">已选择 <b id="dupSelCount">0</b> 个文件，预计回收 <b id="dupSelSpace">0 KB</b></div>
       <div class="spacer"></div>
       <span class="small muted">当前筛选共 <b id="dupFtGroups">0</b> 组 · <b id="dupFtFiles">0</b> 个可清理副本</span>
+      <button class="btn danger-solid dup-delete-cta" id="btnDupDelete" type="button" disabled>清理选中项</button>
     </div>
   </section>
 </div>
@@ -636,14 +771,16 @@ input,select{font-family:inherit}
 <!-- 批量改名弹层 -->
 <div class="modal-mask" id="modalRename">
   <div class="modal" style="width:880px">
-    <div class="modal-hd">批量改名<span class="rn-hd-sub">自定义规则重组 + 前缀/后缀/序号（可叠加、可跳过）</span></div>
+    <div class="modal-hd">批量改名<span class="rn-hd-sub" id="rnModeSub"></span></div>
     <div class="modal-bd rn-bd">
-      <div class="rn-stepbar">
-        <label class="rn-step"><input type="checkbox" id="rnCustomEnable" checked> 自定义规则重组</label>
-        <span class="rn-arrow">→</span>
-        <label class="rn-step"><input type="checkbox" id="rnClassicEnable" checked> 前缀 / 后缀 / 序号</label>
-      </div>
+      <div class="rn-mode-summary"><b id="rnModeTitle"></b><span class="order" id="rnModeOrder"></span></div>
       <div class="rn-custom" id="rnCustomArea">
+        <div class="rn-analysis-bar">
+          <button class="btn" id="btnRnAnalyze">开始分析名称结构</button>
+          <button class="btn" id="btnRnCancelAnalyze" style="display:none">取消分析</button>
+          <span class="rn-analysis-status" id="rnAnalysisStatus">尚未分析</span>
+          <div class="rn-progress"><i id="rnAnalysisProgress"></i></div>
+        </div>
         <div class="rn-sepbar">
           <span class="rn-sep-label">分割符号：</span>
           <span class="rn-sep-chips" id="rnSepChips"></span>
@@ -652,6 +789,15 @@ input,select{font-family:inherit}
         </div>
         <div class="rn-tips">按所选分割符识别勾选文件的共同结构，生成若干模板；每个模板可拖拽重排积木、点积木间输入内容、点 × 删除。</div>
         <div class="rn-templates" id="rnTemplates"></div>
+        <div class="rn-pager" id="rnTemplatePager" style="display:none">
+          <button class="rn-page-btn" id="btnRnTplPrev">上一页</button>
+          <span id="rnTplPageInfo"></span>
+          <button class="rn-page-btn" id="btnRnTplNext">下一页</button>
+          <select id="rnTplPageSize" class="rn-page-btn" style="padding:0 6px">
+            <option value="20" selected>每页 20 个模板</option>
+            <option value="50">每页 50 个模板</option>
+          </select>
+        </div>
       </div>
       <div class="rn-classic" id="rnClassicArea">
         <div class="rn-classic-hd">前缀 / 后缀 / 序号</div>
@@ -673,7 +819,19 @@ input,select{font-family:inherit}
         <div style="font-size:12px;color:var(--muted);margin:6px 0 4px">执行顺序：自定义规则重组 → 查找替换 → 前缀 → 后缀 → 序号</div>
       </div>
       <div class="rn-preview-title">预览</div>
+      <div class="rn-preview-tools">
+        <select id="rnPreviewFilter">
+          <option value="all">显示全部结果</option>
+          <option value="conflict">只看重名项</option>
+        </select>
+        <span class="rn-preview-meta" id="rnPreviewMeta">预览显示前 100 条</span>
+      </div>
       <div class="preview-list" id="rnPreview" style="max-height:220px"></div>
+      <div class="rn-pager">
+        <button class="rn-page-btn" id="btnRnPreviewPrev">上一页</button>
+        <span id="rnPreviewPageInfo"></span>
+        <button class="rn-page-btn" id="btnRnPreviewNext">下一页</button>
+      </div>
     </div>
     <div class="modal-ft">
       <span id="rnConflictCount" style="font-size:12.5px;color:var(--muted);margin-right:auto"></span>
@@ -725,13 +883,91 @@ input,select{font-family:inherit}
   </div>
 </div>
 
+<!-- 无文件文件夹 -->
+<div class="modal-mask" id="modalEmptyFolders">
+  <div class="modal empty-folder-modal">
+    <div class="modal-hd">
+      无文件文件夹
+      <span class="rn-hd-sub" id="emptyFolderHeadCount">0 个</span>
+      <button class="modal-close" id="btnEmptyFoldersClose" type="button" title="关闭">×</button>
+    </div>
+    <div class="modal-bd">
+      <div class="empty-folder-summary">
+        <b>识别口径：</b>文件夹本身及其全部子文件夹中都不含文件。勾选父文件夹后，其下所有子文件夹会一并删除，无需逐级勾选。
+      </div>
+      <div class="empty-folder-toolbar">
+        <div class="search-wrap">
+          <span class="search-ico">&#128269;</span>
+          <input class="textbox" id="emptyFolderSearch" placeholder="搜索文件夹名称…">
+        </div>
+        <button class="btn" id="btnEmptyFolderSelectAll" type="button">全选当前结果</button>
+        <button class="btn" id="btnEmptyFolderClear" type="button">清空选择</button>
+      </div>
+      <div class="empty-folder-list" id="emptyFolderList"></div>
+    </div>
+    <div class="empty-folder-ft">
+      <div class="summary" id="emptyFolderSelectionSummary">已勾选 <b>0</b> 个文件夹</div>
+      <div class="actions">
+        <button class="btn" id="btnEmptyFoldersCancel" type="button">取消</button>
+        <button class="btn danger-solid" id="btnEmptyFoldersDelete" type="button" disabled>删除选中文件夹</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalEmptyFolderDelete">
+  <div class="modal">
+    <div class="modal-hd"><span class="warn">&#9888;&#65039;</span>删除空文件夹</div>
+    <div class="modal-bd" id="emptyFolderDeleteBody"></div>
+    <div class="modal-ft">
+      <button class="btn" id="btnCancelEmptyFolderDelete" type="button">取消</button>
+      <button class="btn danger-solid" id="btnConfirmEmptyFolderDelete" type="button">确认移入回收站</button>
+    </div>
+  </div>
+</div>
+
+<!-- 批量解压 -->
+<div class="modal-mask" id="modalExtract">
+  <div class="modal extract-modal">
+    <div class="modal-hd">
+      批量解压压缩文件
+      <span class="rn-hd-sub" id="extractHeadCount"></span>
+      <button class="modal-close" id="btnExtractClose" type="button" title="关闭">×</button>
+    </div>
+    <div class="modal-bd">
+      <div class="extract-intro" id="extractIntro">
+        每个压缩文件会解压到其所在目录下、与压缩包同名的独立文件夹中。<b>解压完成后不会自动更新当前扫描结果。</b>
+      </div>
+      <div class="extract-summary" id="extractSummary"></div>
+      <div class="extract-preview" id="extractPreview"></div>
+      <div class="extract-options" id="extractOptions">
+        <div class="title">目标文件夹已存在时</div>
+        <div class="opts">
+          <label><input type="radio" name="extractConflict" value="rename" checked>自动创建新文件夹（推荐）</label>
+          <label><input type="radio" name="extractConflict" value="merge">合并并覆盖同名文件</label>
+          <label><input type="radio" name="extractConflict" value="skip">跳过该压缩包</label>
+        </div>
+      </div>
+      <div class="extract-progress" id="extractProgress" style="display:none">
+        <div class="meta"><span id="extractProgressText">正在准备…</span><b id="extractProgressPct">0%</b></div>
+        <div class="progress-track"><div class="progress-fill" id="extractProgressFill"></div></div>
+      </div>
+      <div class="extract-done-note" id="extractDoneNote" style="display:none"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" id="btnExtractCancel" type="button">取消</button>
+      <button class="btn primary" id="btnExtractConfirm" type="button">开始解压</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-zone" id="toastZone"></div>
 
 <script>
 'use strict';
 /* ================= 运行模式与通信层 ================= */
-console.log('[文件整理助手] UI 版本 2026-11-21-03');
-document.documentElement.setAttribute('data-ui-version', '2026-11-21-03');
+console.log('[文件整理助手] UI 版本 2026-11-28-02');
+document.documentElement.setAttribute('data-ui-version', '2026-11-28-02');
 var isWebView = !!(window.chrome && window.chrome.webview);
 var demoMode = !isWebView;
 var lastExportPath = '';
@@ -768,13 +1004,21 @@ function handleHostMessage(msg){
     case 'export.overwrite': handleExportOverwrite(msg.payload); break;
     case 'export.result': handleExportResult(msg.payload); break;
     case 'operation.done': handleOperationDone(msg.payload); break;
+    case 'folder.delete.done': emptyFolderHandleDeleteDone(msg.payload); break;
+    case 'archive.progress': extractHandleProgress(msg.payload); break;
+    case 'archive.done': extractHandleDone(msg.payload); break;
     case 'duplicate.scan.progress': dupHandleProgress(msg.payload); break;
     case 'duplicate.scan.done': dupHandleDone(msg.payload); break;
     case 'duplicate.scan.cancelled': dupHandleCancelled(msg.payload); break;
     case 'duplicate.scan.error': dupHandleError(msg.payload); break;
     case 'duplicate.delete.done': dupHandleDeleteDone(msg.payload); break;
+    case 'duplicate.skipped.export.done': dupHandleSkippedExportDone(msg.payload); break;
     case 'toast': toast(msg.payload.message, msg.payload.kind); break;
-    case 'error': toast(msg.payload.message, 'err'); break;
+    case 'error':
+      emptyFolderDeleting = false;
+      extractRunning = false;
+      toast(msg.payload.message, 'err');
+      break;
   }
 }
 
@@ -822,6 +1066,93 @@ if (demoMode) {
   }
   allData.sort(function(a,b){ return a.path.toLowerCase() < b.path.toLowerCase() ? -1 : 1; });
 }
+
+// 原型演示数据：以下每个节点都代表“整棵子树不含文件”的文件夹。
+var emptyFolderDemoRaw = [
+  { name:'归档', children:[
+    { name:'2024年旧项目', children:[
+      { name:'图片备份' },
+      { name:'临时草稿' }
+    ]},
+    { name:'待处理' }
+  ]},
+  { name:'素材库', children:[
+    { name:'未使用', children:[
+      { name:'图标草稿' },
+      { name:'截图' }
+    ]},
+    { name:'空模板' }
+  ]},
+  { name:'导出清单', children:[
+    { name:'第一批' },
+    { name:'第二批' }
+  ]},
+  { name:'旧扫描结果' }
+];
+var emptyFolderRoots = [];
+var emptyFolderDeleting = false;
+function prepareEmptyFolderDemo(nodes, parent, parentPath){
+  return nodes.map(function(raw){
+    var full = parentPath ? joinPath(parentPath, raw.name) : joinPath('D:\\演示目录', raw.name);
+    var node = {
+      name: raw.name,
+      full: full,
+      children: [],
+      parent: parent,
+      checked: false,
+      indeterminate: false,
+      expanded: true
+    };
+    node.children = prepareEmptyFolderDemo(raw.children || [], node, full);
+    return node;
+  });
+}
+function resetEmptyFolderDemo(){
+  emptyFolderRoots = prepareEmptyFolderDemo(emptyFolderDemoRaw, null, '');
+}
+function buildEmptyFolderTree(folders){
+  var candidates = (folders || []).map(function(folder){
+    return {
+      name: folder.name || '',
+      full: folder.fullPath || folder.path || '',
+      children: [],
+      parent: null,
+      checked: false,
+      indeterminate: false,
+      expanded: true
+    };
+  }).filter(function(node){
+    return node.full !== '';
+  }).sort(function(a, b){
+    return a.full.length - b.full.length;
+  });
+
+  var map = {};
+  var roots = [];
+  candidates.forEach(function(node){
+    map[node.full.toLowerCase()] = node;
+  });
+  candidates.forEach(function(node){
+    var slash = node.full.lastIndexOf('\\');
+    var parentPath = slash > 0 ? node.full.substring(0, slash) : '';
+    var parent = parentPath ? map[parentPath.toLowerCase()] : null;
+    if (parent){
+      node.parent = parent;
+      parent.children.push(node);
+    } else {
+      roots.push(node);
+    }
+  });
+  function sortNodes(nodes){
+    nodes.sort(function(a, b){
+      return a.full.toLowerCase() < b.full.toLowerCase() ? -1 : 1;
+    });
+    nodes.forEach(function(node){ sortNodes(node.children); });
+  }
+  sortNodes(roots);
+  return roots;
+}
+resetEmptyFolderDemo();
 var extCounts = {};
 var extList = [];
 
@@ -865,6 +1196,7 @@ document.querySelectorAll('.tab').forEach(function(t){
 function switchTab(name){
   document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('active', x.dataset.tab===name); });
   document.querySelectorAll('.panel').forEach(function(x){ x.classList.toggle('active', x.id==='panel-'+name); });
+  document.body.classList.toggle('result-layout', name==='result');
   if (name==='result'){ requestAnimationFrame(renderRows); }
   if (name==='dupResult'){ dupRenderGroups(); }
 }
@@ -990,8 +1322,15 @@ function handleScanDone(p){
   var n = (p.files||[]).length;
   $('scanFileCount').textContent = '已发现 ' + n.toLocaleString() + ' 个文件';
   buildData(p.files);
+  if (demoMode){
+    resetEmptyFolderDemo();
+  } else {
+    emptyFolderRoots = buildEmptyFolderTree(p.folders || []);
+  }
+  emptyFolderRefreshBadge();
   $('scanDone').style.display = 'block';
   var extra = (demoMode && p.exportRequested) ? '，已生成 xlsx（预览模拟）' : '';
+  extra += '；识别到 ' + emptyFolderAllNodes().length.toLocaleString() + ' 个无文件文件夹';
   $('scanDone').innerHTML = '&#9989; 扫描完成，共 ' + n.toLocaleString() + ' 个文件' + extra;
   toast('扫描完成，共 ' + n.toLocaleString() + ' 个文件', 'ok');
   switchTab('result');
@@ -1011,6 +1350,262 @@ function buildData(files){
   });
   rebuildIndex();
 }
+
+/* ================= 无文件文件夹 ================= */
+function emptyFolderFlatten(nodes, out){
+  out = out || [];
+  nodes.forEach(function(node){
+    out.push(node);
+    emptyFolderFlatten(node.children, out);
+  });
+  return out;
+}
+
+function emptyFolderAllNodes(){
+  return emptyFolderFlatten(emptyFolderRoots, []);
+}
+
+function emptyFolderDescendantCount(node){
+  return node.children.reduce(function(total, child){
+    return total + 1 + emptyFolderDescendantCount(child);
+  }, 0);
+}
+
+function emptyFolderTreeMatches(node, keyword){
+  if (!keyword) return true;
+  if ((node.name + ' ' + node.full).toLowerCase().indexOf(keyword) >= 0) return true;
+  return node.children.some(function(child){ return emptyFolderTreeMatches(child, keyword); });
+}
+
+function emptyFolderOwnMatches(node, keyword){
+  return !keyword || (node.name + ' ' + node.full).toLowerCase().indexOf(keyword) >= 0;
+}
+
+function emptyFolderSelectedNodes(){
+  return emptyFolderAllNodes().filter(function(node){ return node.checked; });
+}
+
+function emptyFolderEffectiveRoots(){
+  return emptyFolderAllNodes().filter(function(node){
+    return node.checked && !(node.parent && node.parent.checked);
+  });
+}
+
+function emptyFolderCoveredNodes(){
+  return emptyFolderFlatten(emptyFolderEffectiveRoots(), []);
+}
+
+function emptyFolderRefreshBadge(){
+  var count = emptyFolderAllNodes().length;
+  $('emptyFolderCount').textContent = count.toLocaleString();
+  $('btnEmptyFolders').classList.toggle('has-items', count > 0);
+  $('btnEmptyFolders').title = count
+    ? '查看 ' + count.toLocaleString() + ' 个整棵子树都不含文件的文件夹'
+    : '本次扫描没有发现无文件文件夹';
+}
+
+function emptyFolderUpdateSelection(){
+  var selected = emptyFolderSelectedNodes();
+  var roots = emptyFolderEffectiveRoots();
+  var covered = emptyFolderCoveredNodes();
+  var text = '已勾选 <b>' + selected.length.toLocaleString() + '</b> 个文件夹';
+  if (roots.length && roots.length !== selected.length){
+    text += ' · 将按 <b>' + roots.length.toLocaleString() + '</b> 个顶层文件夹处理，共覆盖 <b>'
+      + covered.length.toLocaleString() + '</b> 个文件夹';
+  }
+  $('emptyFolderSelectionSummary').innerHTML = text;
+  $('btnEmptyFoldersDelete').disabled = roots.length === 0 || emptyFolderDeleting;
+}
+
+function renderEmptyFolderList(){
+  var list = $('emptyFolderList');
+  var keyword = $('emptyFolderSearch').value.trim().toLowerCase();
+  list.innerHTML = '';
+  var rowCount = 0;
+
+  function walk(nodes, depth){
+    nodes.forEach(function(node){
+      if (!emptyFolderTreeMatches(node, keyword)) return;
+      rowCount++;
+      var row = document.createElement('div');
+      row.className = 'empty-folder-row';
+      row.style.paddingLeft = (7 + depth * 22) + 'px';
+
+      var toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'toggle' + (node.children.length ? '' : ' placeholder');
+      toggle.textContent = node.children.length ? (node.expanded ? '▼' : '▶') : '';
+      toggle.title = node.children.length ? (node.expanded ? '收起子文件夹' : '展开子文件夹') : '';
+      if (node.children.length){
+        toggle.addEventListener('click', function(){
+          node.expanded = !node.expanded;
+          renderEmptyFolderList();
+        });
+      }
+
+      var checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = node.checked;
+      checkbox.indeterminate = node.indeterminate;
+      checkbox.title = '勾选后将连带删除其下所有子文件夹';
+      checkbox.addEventListener('change', function(){
+        setSubChecked(node, checkbox.checked);
+        refreshAncestors(node);
+        renderEmptyFolderList();
+      });
+
+      var icon = document.createElement('span');
+      icon.className = 'folder-icon';
+      icon.textContent = '📁';
+
+      var name = document.createElement('span');
+      name.className = 'folder-name';
+      name.textContent = node.name;
+      name.title = node.full;
+
+      var derived = document.createElement('span');
+      derived.className = 'folder-derived';
+      derived.textContent = node.children.length
+        ? '含 ' + emptyFolderDescendantCount(node).toLocaleString() + ' 个子文件夹'
+        : '空文件夹';
+
+      row.appendChild(toggle);
+      row.appendChild(checkbox);
+      row.appendChild(icon);
+      row.appendChild(name);
+      row.appendChild(derived);
+      list.appendChild(row);
+
+      if (node.children.length && (node.expanded || keyword)){
+        walk(node.children, depth + 1);
+      }
+    });
+  }
+
+  walk(emptyFolderRoots, 0);
+  if (!rowCount){
+    list.innerHTML = '<div class="empty-folder-empty">没有找到匹配的无文件文件夹</div>';
+  }
+  $('emptyFolderHeadCount').textContent = emptyFolderAllNodes().length.toLocaleString() + ' 个';
+  emptyFolderUpdateSelection();
+}
+
+function openEmptyFolderModal(){
+  $('emptyFolderSearch').value = '';
+  renderEmptyFolderList();
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+  $('modalEmptyFolders').classList.add('open');
+}
+
+function closeEmptyFolderModal(){
+  if (emptyFolderDeleting){
+    toast('正在删除文件夹，请等待本次操作完成。', 'warn');
+    return;
+  }
+  $('modalEmptyFolders').classList.remove('open');
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+}
+
+function showEmptyFolderDeleteConfirm(){
+  var roots = emptyFolderEffectiveRoots();
+  if (!roots.length) return;
+  var covered = emptyFolderCoveredNodes();
+  var descendants = covered.length - roots.length;
+  var html = '<div>将删除 <b>' + roots.length.toLocaleString() + '</b> 个顶层文件夹';
+  if (descendants > 0) html += '，连同其下 <b>' + descendants.toLocaleString() + '</b> 个子文件夹';
+  html += '，共 <b>' + covered.length.toLocaleString() + '</b> 个文件夹。</div>';
+  html += '<div class="empty-folder-confirm-list">';
+  roots.forEach(function(node){ html += '<div class="row-item">' + escapeHtml(node.full) + '</div>'; });
+  html += '</div>';
+  html += '<div class="danger-note">删除时只处理文件夹本身；若扫描后目录中新增了文件，该目录及文件会被跳过。</div>';
+  $('emptyFolderDeleteBody').innerHTML = html;
+  $('modalEmptyFolderDelete').classList.add('open');
+}
+
+function confirmEmptyFolderDelete(){
+  var roots = emptyFolderEffectiveRoots();
+  if (!roots.length) return;
+  var coveredCount = emptyFolderCoveredNodes().length;
+  var paths = roots.map(function(node){ return node.full; });
+  $('modalEmptyFolderDelete').classList.remove('open');
+
+  if (!demoMode){
+    emptyFolderDeleting = true;
+    $('emptyFolderSelectionSummary').textContent = '正在复核并删除 ' + paths.length.toLocaleString() + ' 个顶层文件夹…';
+    $('btnEmptyFoldersDelete').disabled = true;
+    postToHost('folder.delete', { folders: paths });
+    return;
+  }
+
+  var rootSet = new Set(roots);
+  function filterNodes(nodes){
+    return nodes.filter(function(node){ return !rootSet.has(node); }).map(function(node){
+      node.children = filterNodes(node.children);
+      return node;
+    });
+  }
+  emptyFolderRoots = filterNodes(emptyFolderRoots);
+  emptyFolderRefreshBadge();
+  renderEmptyFolderList();
+  toast('原型演示：已选择 ' + coveredCount.toLocaleString() + ' 个文件夹移入回收站', 'ok');
+}
+
+function emptyFolderHandleDeleteDone(result){
+  emptyFolderDeleting = false;
+  result = result || {};
+  var deletedPaths = result.deletedPaths || [];
+  var deletedSet = new Set(deletedPaths.map(function(path){ return String(path).toLowerCase(); }));
+  function filterNodes(nodes){
+    return nodes.filter(function(node){
+      return !deletedSet.has(node.full.toLowerCase());
+    }).map(function(node){
+      node.children = filterNodes(node.children);
+      return node;
+    });
+  }
+  emptyFolderRoots = filterNodes(emptyFolderRoots);
+  emptyFolderRefreshBadge();
+  renderEmptyFolderList();
+
+  var skipped = result.skipped || [];
+  var failed = result.failed || [];
+  var message = '文件夹清理完成：成功 ' + (Number(result.succeeded) || deletedPaths.length).toLocaleString()
+    + ' 个，跳过 ' + skipped.length.toLocaleString() + ' 个';
+  if (failed.length) message += '，失败 ' + failed.length.toLocaleString() + ' 个';
+  toast(message, skipped.length || failed.length ? 'warn' : 'ok');
+  skipped.slice(0, 3).forEach(function(item){
+    toast('已跳过：' + item.path + '（' + item.reason + '）', 'warn');
+  });
+  failed.slice(0, 3).forEach(function(item){
+    toast('删除失败：' + item.path + '（' + item.reason + '）', 'err');
+  });
+}
+
+$('btnEmptyFolders').addEventListener('click', openEmptyFolderModal);
+$('btnEmptyFoldersClose').addEventListener('click', closeEmptyFolderModal);
+$('btnEmptyFoldersCancel').addEventListener('click', closeEmptyFolderModal);
+$('emptyFolderSearch').addEventListener('input', renderEmptyFolderList);
+$('btnEmptyFolderClear').addEventListener('click', function(){
+  emptyFolderAllNodes().forEach(function(node){ node.checked = false; node.indeterminate = false; });
+  renderEmptyFolderList();
+});
+$('btnEmptyFolderSelectAll').addEventListener('click', function(){
+  var keyword = $('emptyFolderSearch').value.trim().toLowerCase();
+  var targets = emptyFolderAllNodes().filter(function(node){ return emptyFolderOwnMatches(node, keyword); });
+  targets.forEach(function(node){
+    setSubChecked(node, true);
+    refreshAncestors(node);
+  });
+  renderEmptyFolderList();
+  toast('已全选 ' + targets.length.toLocaleString() + ' 个匹配文件夹；父文件夹会自动包含其子文件夹。', 'ok');
+});
+$('btnEmptyFoldersDelete').addEventListener('click', showEmptyFolderDeleteConfirm);
+$('btnCancelEmptyFolderDelete').addEventListener('click', function(){
+  $('modalEmptyFolderDelete').classList.remove('open');
+});
+$('btnConfirmEmptyFolderDelete').addEventListener('click', confirmEmptyFolderDelete);
 
 /* ================= 浏览文件夹 ================= */
 var pendingBrowse = null;
@@ -1397,6 +1992,15 @@ function renderRows(){
   vRows.appendChild(frag);
 }
 vlist.addEventListener('scroll', function(){ renderRows(); });
+var resultResizeFrame = 0;
+window.addEventListener('resize', function(){
+  if (!document.body.classList.contains('result-layout')) return;
+  if (resultResizeFrame) cancelAnimationFrame(resultResizeFrame);
+  resultResizeFrame = requestAnimationFrame(function(){
+    resultResizeFrame = 0;
+    renderRows();
+  });
+});
 
 $('chkAll').addEventListener('change', function(){
   var want = this.checked;
@@ -1404,10 +2008,49 @@ $('chkAll').addEventListener('change', function(){
   updateSelectedCount();
   renderRows();
 });
+$('panelSelectPreset').addEventListener('click', function(e){
+  var item = e.target.closest('[data-select-count]');
+  if (!item) return;
+  applySelectionPreset(item.dataset.selectCount);
+  $('panelSelectPreset').classList.remove('open');
+  $('btnSelectPreset').classList.remove('active');
+});
+$('clearSelection').addEventListener('click', function(){
+  allData.forEach(function(file){ file.checked = false; });
+  updateSelectedCount();
+  renderRows();
+  $('panelSelectPreset').classList.remove('open');
+  $('btnSelectPreset').classList.remove('active');
+});
+function applySelectionPreset(mode){
+  var candidates = visible;
+  if (mode === 'visible'){
+    var start = Math.max(0, Math.floor(vlist.scrollTop / ROW));
+    var end = Math.min(visible.length, Math.ceil((vlist.scrollTop + vlist.clientHeight) / ROW));
+    candidates = visible.slice(start, end);
+  }
+  allData.forEach(function(file){ file.checked = false; });
+  var count = (mode === 'all' || mode === 'visible')
+    ? candidates.length
+    : Math.min(candidates.length, parseInt(mode, 10) || 0);
+  for (var i=0;i<count;i++) candidates[i].checked = true;
+  updateSelectedCount();
+  renderRows();
+}
 function updateSelectedCount(){
   var sel = 0;
-  for (var i=0;i<allData.length;i++) if (allData[i].checked) sel++;
+  var archiveCount = 0;
+  for (var i=0;i<allData.length;i++){
+    if (allData[i].checked){
+      sel++;
+      if (isArchiveFile(allData[i])) archiveCount++;
+    }
+  }
   $('ftSelected').textContent = '已勾选 ' + sel.toLocaleString() + ' 个';
+  $('btnExtract').textContent = archiveCount ? '批量解压 (' + archiveCount.toLocaleString() + ')' : '批量解压';
+  $('btnExtract').title = archiveCount
+    ? '解压已勾选中的 ' + archiveCount.toLocaleString() + ' 个压缩文件'
+    : '勾选 ZIP、RAR、7Z、TAR、GZ 或 TGZ 文件后可批量解压';
   var visSel = 0;
   for (var j=0;j<visible.length;j++) if (visible[j].checked) visSel++;
   var chkAll = $('chkAll');
@@ -1431,6 +2074,8 @@ function bindDropdown(btnId, panelId){
 bindDropdown('btnFormat','panelFormat');
 bindDropdown('btnPath','panelPath');
 bindDropdown('btnSize','panelSize');
+bindDropdown('btnSelectPreset','panelSelectPreset');
+bindDropdown('btnRename','panelRenameMode');
 document.querySelectorAll('.drop-panel').forEach(function(p){
   p.addEventListener('click', function(e){ e.stopPropagation(); });
 });
@@ -1484,11 +2129,61 @@ $('btnMoveOk').addEventListener('click', function(){
 });
 
 // ---- 批量改名（自定义规则 + 经典规则 + 撤销） ----
+var RENAME_RULE_REGISTRY = [
+  { id:'simple', label:'简单改名', description:'前缀、后缀、查找替换、序号，不进行名称结构分析', areaId:'rnClassicArea', executionOrder:20 },
+  { id:'custom', label:'自定义规则重组', description:'按需分析名称结构，再拖拽积木重排', areaId:'rnCustomArea', requiresAnalysis:true, executionOrder:10 }
+];
+var rnActiveMode = '';
+var rnAnalysisDone = false;
+var rnAnalyzing = false;
+var rnAnalysisToken = 0;
+var rnTemplatePage = 1;
+var rnTemplatePageSize = 20;
+var rnPreviewItems = [];
+var rnPreviewPage = 1;
+var rnPreviewPageSize = 100;
+var rnPreviewTimer = null;
 var DEFAULT_SEPS = [' ', '-', '_', '《', '》', '【', '】', '「', '」', '：', '，', '。', '！', '？', '…', '—', '·', '（', '）', '(', ')', '[', ']', '{', '}', ':', ',', '.', '!', '?', '@', '#', '&', '+', '=', '~', '|', '\\', '/', '、', '；'];
 var rnSepSet = new Set(DEFAULT_SEPS);
 var rnCustomSeps = [];   // 用户自定义分割符
 var rnGroups = [];       // 识别出的模板组
 var rnHistory = [];      // 本次运行改名记录
+function rnRuleById(id){ return RENAME_RULE_REGISTRY.find(function(rule){ return rule.id === id; }) || null; }
+function rnAllRuleIds(){
+  return RENAME_RULE_REGISTRY.slice()
+    .sort(function(left, right){ return left.executionOrder - right.executionOrder; })
+    .map(function(rule){ return rule.id; });
+}
+function rnModeUses(ruleId){
+  return rnActiveMode === ruleId || rnActiveMode === 'all';
+}
+function rnRenderModeMenu(){
+  var list = $('renameModeList');
+  list.innerHTML = '';
+  RENAME_RULE_REGISTRY.forEach(function(rule){
+    var button = document.createElement('button');
+    button.className = 'rename-mode-item';
+    button.type = 'button';
+    button.dataset.rule = rule.id;
+    button.innerHTML = '<b>' + escapeHtml(rule.label) + '</b><small>' + escapeHtml(rule.description) + '</small>';
+    list.appendChild(button);
+  });
+  var all = document.createElement('button');
+  all.className = 'rename-mode-item all';
+  all.type = 'button';
+  all.dataset.rule = 'all';
+  all.innerHTML = '<b>全部规则</b><small>当前包含：'
+    + rnAllRuleIds().map(function(id){ return rnRuleById(id).label; }).join(' + ')
+    + '</small>';
+  list.appendChild(all);
+}
+$('renameModeList').addEventListener('click', function(event){
+  var item = event.target.closest('[data-rule]');
+  if (!item) return;
+  $('panelRenameMode').classList.remove('open');
+  $('btnRename').classList.remove('active');
+  rnOpenRenameMode(item.dataset.rule);
+});
 function rnSepList(){ return Array.from(rnSepSet).sort(function(a,b){ return b.length-a.length; }); }
 // 拆分基名 → [{type:'sep'|'var'}]（空文本段不生成，连续符号直接相邻）
 function rnSplitName(name, seps){
@@ -1528,30 +2223,151 @@ function rnExtractVars(name, seps){
   return vals;
 }
 function rnCnNum(n){ return ['一','二','三','四','五','六','七','八','九','十'][n-1] || n; }
-// 构建模板组：按符号序列分组
-function rnBuildGroups(sel){
-  var seps = rnSepList();
-  var map = {};
-  sel.forEach(function(f){
-    var base = f.name;
-    var blocks = rnSplitName(base, seps);
-    var key = rnSepKey(blocks) || '\u0000';
-    if (!map[key]) map[key] = { sepSeq: blocks.filter(function(b){return b.type==='sep';}).map(function(b){return b.value;}), files: [] };
-    map[key].files.push({ f: f, vars: rnExtractVars(base, seps) });
-  });
+function rnCloneBlocks(blocks){
+  return blocks.map(function(block){ return Object.assign({}, block); });
+}
+function rnBuildGroupsFromMap(map){
   var groups = [];
-  for (var k in map){
-    var g = map[k];
+  Object.keys(map).forEach(function(key){
+    var group = map[key];
     var blocks = [];
-    var vi = 0;
-    var fblocks = rnSplitName(g.files[0].f.name, seps);
-    fblocks.forEach(function(b){
-      if (b.type==='sep') blocks.push({type:'sep', value:b.value});
-      else blocks.push({type:'var', varIndex: vi++});
+    var variableIndex = 0;
+    rnSplitName(group.files[0].f.name, rnSepList()).forEach(function(block){
+      if (block.type === 'sep') blocks.push({ type:'sep', value:block.value });
+      else blocks.push({ type:'var', varIndex:variableIndex++ });
     });
-    groups.push({ blocks: blocks, files: g.files, name: '模板 ' + (groups.length+1) });
-  }
+    groups.push({
+      blocks: blocks,
+      adjustedBlocks: rnCloneBlocks(blocks),
+      files: group.files,
+      name: ''
+    });
+  });
+  groups.sort(function(left, right){ return right.files.length - left.files.length; });
+  groups.forEach(function(group, index){ group.name = '模板 ' + (index + 1); });
   return groups;
+}
+function rnYield(){
+  return new Promise(function(resolve){ setTimeout(resolve, 0); });
+}
+function rnUpdateRenameActionState(){
+  var needsAnalysis = rnModeUses('custom');
+  $('btnRenameOk').disabled = rnAnalyzing || (needsAnalysis && !rnAnalysisDone) || getSelected().length === 0;
+}
+function rnResetCustomAnalysis(message){
+  rnAnalysisToken++;
+  rnAnalyzing = false;
+  rnAnalysisDone = false;
+  rnGroups = [];
+  rnTemplatePage = 1;
+  $('btnRnAnalyze').disabled = false;
+  $('btnRnAnalyze').textContent = '开始分析名称结构';
+  $('btnRnCancelAnalyze').style.display = 'none';
+  $('rnAnalysisStatus').textContent = message || '尚未分析';
+  $('rnAnalysisProgress').style.width = '0%';
+  $('rnTemplates').innerHTML = '<div class="rn-empty">点击“开始分析名称结构”后再生成模板；分析在后台分批执行，不会阻塞界面。</div>';
+  $('rnTemplatePager').style.display = 'none';
+  rnPreviewItems = [];
+  rnPreviewPage = 1;
+  $('rnPreview').innerHTML = '';
+  $('rnPreviewMeta').textContent = '预览显示前 100 条';
+  $('rnPreviewPageInfo').textContent = '';
+  $('rnConflictCount').textContent = '';
+  rnUpdateRenameActionState();
+}
+async function rnAnalyzeNamesAsync(){
+  if (rnAnalyzing) return;
+  var selected = getSelected();
+  if (!selected.length){
+    toast('请先勾选要重命名的文件。', 'warn');
+    return;
+  }
+
+  var token = ++rnAnalysisToken;
+  rnAnalyzing = true;
+  rnAnalysisDone = false;
+  rnGroups = [];
+  rnTemplatePage = 1;
+  var separators = rnSepList();
+  var map = Object.create(null);
+  var chunkSize = 150;
+  $('btnRnAnalyze').disabled = true;
+  $('btnRnAnalyze').textContent = '分析中…';
+  $('btnRnCancelAnalyze').style.display = '';
+  $('rnTemplates').innerHTML = '';
+  $('rnTemplatePager').style.display = 'none';
+  rnUpdateRenameActionState();
+
+  for (var start=0; start<selected.length; start+=chunkSize){
+    if (token !== rnAnalysisToken) return;
+    var end = Math.min(selected.length, start + chunkSize);
+    for (var index=start; index<end; index++){
+      var file = selected[index];
+      var blocks = rnSplitName(file.name, separators);
+      var key = rnSepKey(blocks) || '\u0000';
+      if (!map[key]) map[key] = { files: [] };
+      map[key].files.push({ f:file, vars:rnExtractVars(file.name, separators) });
+    }
+    var percent = Math.floor(end * 100 / selected.length);
+    $('rnAnalysisStatus').textContent = '正在分析名称结构… ' + end.toLocaleString()
+      + ' / ' + selected.length.toLocaleString();
+    $('rnAnalysisProgress').style.width = percent + '%';
+    await rnYield();
+  }
+
+  if (token !== rnAnalysisToken) return;
+  rnGroups = rnBuildGroupsFromMap(map);
+  rnAnalyzing = false;
+  rnAnalysisDone = true;
+  $('btnRnAnalyze').disabled = false;
+  $('btnRnAnalyze').textContent = '重新分析';
+  $('btnRnCancelAnalyze').style.display = 'none';
+  $('rnAnalysisStatus').textContent = '分析完成：' + selected.length.toLocaleString()
+    + ' 个文件，识别 ' + rnGroups.length.toLocaleString() + ' 个模板';
+  $('rnAnalysisProgress').style.width = '100%';
+  rnRenderTemplates();
+  rnScheduleRenamePreview(true);
+  rnUpdateRenameActionState();
+}
+function rnCancelAnalysis(){
+  if (!rnAnalyzing) return;
+  rnAnalysisToken++;
+  rnAnalyzing = false;
+  rnAnalysisDone = false;
+  $('btnRnAnalyze').disabled = false;
+  $('btnRnAnalyze').textContent = '开始分析名称结构';
+  $('btnRnCancelAnalyze').style.display = 'none';
+  $('rnAnalysisStatus').textContent = '分析已取消';
+  rnUpdateRenameActionState();
+}
+function rnOpenRenameMode(mode){
+  var selected = getSelected();
+  if (!selected.length){
+    toast('请先勾选要重命名的文件。', 'warn');
+    return;
+  }
+  if (mode !== 'all' && !rnRuleById(mode)) return;
+  rnActiveMode = mode;
+  var titles = mode === 'all' ? '全部规则' : rnRuleById(mode).label;
+  $('modalRename').classList.add('open');
+  $('rnModeTitle').textContent = titles;
+  $('rnModeSub').textContent = '将处理 ' + selected.length.toLocaleString() + ' 个文件';
+  $('rnModeOrder').textContent = mode === 'all'
+    ? '执行顺序：' + rnAllRuleIds().map(function(id){ return rnRuleById(id).label; }).join(' → ')
+    : (mode === 'custom' ? '需要先分析名称结构' : '立即加载，无需名称结构分析');
+
+  RENAME_RULE_REGISTRY.forEach(function(rule){
+    $(rule.areaId).style.display = rnModeUses(rule.id) ? '' : 'none';
+  });
+  rnRenderSepChips();
+  $('rnPreviewFilter').value = 'all';
+  rnPreviewItems = [];
+  rnPreviewPage = 1;
+  if (rnModeUses('custom')) rnResetCustomAnalysis('尚未分析');
+  else {
+    $('btnRenameOk').disabled = false;
+    rnScheduleRenamePreview(true);
+  }
 }
 // 生成积木块元素
 function rnMakeBlock(b, editable){
@@ -1565,7 +2381,13 @@ function rnMakeBlock(b, editable){
     var del = document.createElement('span');
     del.className = 'bb-del';
     del.textContent = '\u00d7';
-    del.addEventListener('click', function(ev){ ev.preventDefault(); ev.stopPropagation(); el.remove(); updateRenamePreview(); });
+    del.addEventListener('click', function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      el.remove();
+      var after = el.closest('.rn-tpl-after');
+      if (after) rnSyncAdjusted(Number(after.dataset.gi));
+    });
     el.appendChild(del);
   }
   return el;
@@ -1614,7 +2436,7 @@ function rnRenderSepChips(){
     inp.addEventListener('change', function(){
       if (inp.checked) rnSepSet.add(sep); else rnSepSet.delete(sep);
       cb.classList.toggle('on', inp.checked);
-      rnReidentify();
+      if (rnModeUses('custom')) rnResetCustomAnalysis('分割符已变更，请重新分析');
     });
     var span = document.createElement('span'); span.textContent = label;
     cb.appendChild(inp); cb.appendChild(span);
@@ -1628,18 +2450,35 @@ $('btnSepAdd').addEventListener('click', function(){
   rnSepSet.add(v); rnCustomSeps.push(v);
   $('rnSepAdd').value = '';
   rnRenderSepChips();
-  rnReidentify();
+  if (rnModeUses('custom')) rnResetCustomAnalysis('分割符已变更，请重新分析');
 });
 $('rnSepAdd').addEventListener('keydown', function(e){ if (e.key==='Enter'){ e.preventDefault(); $('btnSepAdd').click(); } });
-// 渲染模板卡片
+function rnSyncAdjusted(gi){
+  var group = rnGroups[gi];
+  if (!group) return;
+  group.adjustedBlocks = rnReadAdjusted(gi);
+  rnScheduleRenamePreview(true);
+}
+// 渲染当前页模板卡片
 function rnRenderTemplates(){
   var box = $('rnTemplates');
   box.innerHTML = '';
-  if (!rnGroups.length){
-    box.innerHTML = '<div class="rn-empty">未识别到模板——请先勾选文件再打开本窗口。</div>';
+  if (!rnAnalysisDone){
+    box.innerHTML = '<div class="rn-empty">尚未分析名称结构。</div>';
+    $('rnTemplatePager').style.display = 'none';
     return;
   }
-  rnGroups.forEach(function(g, gi){
+  if (!rnGroups.length){
+    box.innerHTML = '<div class="rn-empty">未识别到模板。</div>';
+    $('rnTemplatePager').style.display = 'none';
+    return;
+  }
+  var pageCount = Math.max(1, Math.ceil(rnGroups.length / rnTemplatePageSize));
+  if (rnTemplatePage > pageCount) rnTemplatePage = pageCount;
+  var start = (rnTemplatePage - 1) * rnTemplatePageSize;
+  var pageGroups = rnGroups.slice(start, start + rnTemplatePageSize);
+  pageGroups.forEach(function(g, localIndex){
+    var gi = start + localIndex;
     var card = document.createElement('div');
     card.className = 'rn-tpl-card';
     var hd = document.createElement('div');
@@ -1655,18 +2494,27 @@ function rnRenderTemplates(){
     after.className = 'rn-tpl-after';
     after.contentEditable = 'true';
     after.id = 'rnAfter' + gi;
-    g.blocks.forEach(function(b){ after.appendChild(rnMakeBlock(b, true)); });
+    after.dataset.gi = String(gi);
+    (g.adjustedBlocks || g.blocks).forEach(function(b){
+      if (b.type === 'text') after.appendChild(document.createTextNode(b.value));
+      else after.appendChild(rnMakeBlock(b, true));
+    });
     rnBindDnD(after);
-    after.addEventListener('input', function(){ updateRenamePreview(); });
+    after.addEventListener('input', function(){ rnSyncAdjusted(gi); });
     var files = document.createElement('div'); files.className = 'rn-tpl-files';
     var names = g.files.map(function(m){ return m.f.name; });
-    files.textContent = '覆盖：' + names.slice(0, 25).join('、') + (names.length > 25 ? ' 等共 ' + names.length + ' 个' : '');
+    files.textContent = '覆盖：' + names.slice(0, 8).join('、') + (names.length > 8 ? ' 等共 ' + names.length + ' 个' : '');
     body.appendChild(lab1); body.appendChild(before);
     body.appendChild(lab2); body.appendChild(after);
     body.appendChild(files);
     card.appendChild(hd); card.appendChild(body);
     box.appendChild(card);
   });
+  $('rnTemplatePager').style.display = '';
+  $('rnTplPageInfo').textContent = '第 ' + rnTemplatePage + ' / ' + pageCount
+    + ' 页 · 共 ' + rnGroups.length.toLocaleString() + ' 个模板';
+  $('btnRnTplPrev').disabled = rnTemplatePage <= 1;
+  $('btnRnTplNext').disabled = rnTemplatePage >= pageCount;
 }
 function rnEl(tag, txt, cls){
   var el = document.createElement(tag);
@@ -1688,7 +2536,7 @@ function rnBindDnD(after){
   after.addEventListener('dragend', function(){
     if (dragEl){ dragEl.style.opacity = ''; dragEl = null; }
     rnClearDropMarker(after);
-    updateRenamePreview();
+    rnSyncAdjusted(Number(after.dataset.gi));
   });
   after.addEventListener('dragover', function(e){
     if (!dragEl) return;
@@ -1706,7 +2554,7 @@ function rnBindDnD(after){
     var ref = after.childNodes[idx];
     if (ref) after.insertBefore(src, ref); else after.appendChild(src);
     src.style.opacity = '';
-    updateRenamePreview();
+    rnSyncAdjusted(Number(after.dataset.gi));
   });
 }
 function rnFindInsertIndex(after, x){
@@ -1729,27 +2577,22 @@ function rnClearDropMarker(after){
   var m = after.querySelectorAll('.rn-drop-marker');
   for (var i=0;i<m.length;i++) m[i].remove();
 }
-// 重新识别模板
-function rnReidentify(){
-  if (!$('modalRename').classList.contains('open')) return;
-  var sel = getSelected();
-  rnGroups = sel.length ? rnBuildGroups(sel) : [];
-  rnRenderTemplates();
-  updateRenamePreview();
+function rnPathKey(path){
+  return String(path || '').replace(/\//g, '\\').toLowerCase();
 }
-// 计算改名结果（自定义规则 → 经典规则叠加）
+// 计算改名结果：自定义规则 → 简单规则
 function rnComputeAll(sel){
   var items = [];
   var customBase = {};
-  if ($('rnCustomEnable').checked && rnGroups.length){
+  if (rnModeUses('custom') && rnAnalysisDone){
     rnGroups.forEach(function(g, gi){
-      var adj = rnReadAdjusted(gi);
+      var adj = g.adjustedBlocks || g.blocks;
       g.files.forEach(function(m){ customBase[m.f.path] = rnApplyTemplate(adj, m.vars); });
     });
   }
   sel.forEach(function(f, idx){
     var base = (customBase[f.path] !== undefined) ? customBase[f.path] : f.name;
-    if ($('rnClassicEnable').checked){
+    if (rnModeUses('simple')){
       var find = $('rnFind').value, rep = $('rnReplace').value, pre = $('rnPrefix').value, suf = $('rnSuffix').value;
       var r = find ? base.split(find).join(rep) : base;
       r = pre + r + suf;
@@ -1763,74 +2606,122 @@ function rnComputeAll(sel){
       }
       base = r;
     }
-    items.push({ path: f.path, newName: base + f.ext, oldBase: f.name, ext: f.ext });
+    var newName = base + f.ext;
+    var dir = f.path.substring(0, f.path.lastIndexOf('\\'));
+    items.push({
+      path: f.path,
+      newName: newName,
+      targetPath: dir + '\\' + newName,
+      oldBase: f.name,
+      ext: f.ext
+    });
   });
   return items;
 }
 var rnInputs = ['rnPrefix','rnSuffix','rnFind','rnReplace','rnSeqStart','rnSeqWidth','rnSeqPos'];
 rnInputs.forEach(function(id){
-  $(id).addEventListener('input', updateRenamePreview);
-  $(id).addEventListener('change', updateRenamePreview);
+  $(id).addEventListener('input', function(){ rnScheduleRenamePreview(true); });
+  $(id).addEventListener('change', function(){ rnScheduleRenamePreview(true); });
 });
 $('rnSeqEnable').addEventListener('change', function(){
   var on = this.checked;
   ['rnSeqStart','rnSeqWidth','rnSeqPos'].forEach(function(id){ $(id).disabled = !on; });
-  updateRenamePreview();
+  rnScheduleRenamePreview(true);
 });
-$('rnCustomEnable').addEventListener('change', function(){
-  $('rnCustomArea').style.display = this.checked ? '' : 'none';
-  updateRenamePreview();
+$('btnRnAnalyze').addEventListener('click', rnAnalyzeNamesAsync);
+$('btnRnCancelAnalyze').addEventListener('click', rnCancelAnalysis);
+$('btnRnTplPrev').addEventListener('click', function(){ rnTemplatePage = Math.max(1, rnTemplatePage - 1); rnRenderTemplates(); });
+$('btnRnTplNext').addEventListener('click', function(){ rnTemplatePage++; rnRenderTemplates(); });
+$('rnTplPageSize').addEventListener('change', function(){ rnTemplatePageSize = Number(this.value) || 20; rnTemplatePage = 1; rnRenderTemplates(); });
+$('btnRenameCancel').addEventListener('click', function(){
+  rnAnalysisToken++;
+  rnAnalyzing = false;
+  closeModal('modalRename');
 });
-$('rnClassicEnable').addEventListener('change', function(){
-  $('rnClassicArea').style.display = this.checked ? '' : 'none';
-  updateRenamePreview();
-});
-$('btnRename').addEventListener('click', function(){
-  var sel = getSelected();
-  if (!sel.length){ toast('请先勾选要重命名的文件','warn'); return; }
-  $('modalRename').classList.add('open');
-  rnRenderSepChips();
-  rnReidentify();
-});
-$('btnRenameCancel').addEventListener('click', function(){ closeModal('modalRename'); });
 $('btnRenameOk').addEventListener('click', function(){
   var sel = getSelected();
+  if (rnModeUses('custom') && !rnAnalysisDone){
+    toast('请先完成名称结构分析。', 'warn');
+    return;
+  }
   var items = rnComputeAll(sel);
+  if (!items.length){
+    toast('没有可执行的改名项。', 'warn');
+    return;
+  }
   lastOp = { op:'rename', items: items };
   closeModal('modalRename');
   if (demoMode){ toast('（预览）将按规则重命名 ' + sel.length + ' 个文件', 'ok'); return; }
   postToHost('file.rename', { items: items });
 });
-function updateRenamePreview(){
+function rnScheduleRenamePreview(resetPage){
+  if (rnPreviewTimer) clearTimeout(rnPreviewTimer);
+  if (resetPage) rnPreviewPage = 1;
+  rnPreviewTimer = setTimeout(function(){
+    rnPreviewTimer = null;
+    rnComputeRenamePreview();
+  }, 260);
+}
+function rnComputeRenamePreview(){
   if (!$('modalRename').classList.contains('open')) return;
   var sel = getSelected();
   if (!sel.length){ $('rnPreview').innerHTML = ''; $('rnConflictCount').textContent = ''; return; }
+  if (rnModeUses('custom') && !rnAnalysisDone){
+    rnPreviewItems = [];
+    $('rnPreview').innerHTML = '<div class="rn-empty">请先完成名称结构分析。</div>';
+    $('rnConflictCount').textContent = '等待分析';
+    rnUpdateRenameActionState();
+    return;
+  }
   var items = rnComputeAll(sel);
-  var conflicts = 0;
-  items.forEach(function(it, i){
-    var dir = it.path.substring(0, it.path.lastIndexOf('\\'));
-    var conflict = false;
-    for (var j=0;j<allData.length;j++){
-      var o = allData[j];
-      if (o === sel[i]) continue;
-      if (o.path.toLowerCase() === (dir + '\\' + it.newName).toLowerCase()){ conflict = true; break; }
-    }
-    if (conflict) conflicts++;
-    it.conflict = conflict;
+  var pathIndex = new Map();
+  allData.forEach(function(file){ pathIndex.set(rnPathKey(file.path), file); });
+  var targetCounts = new Map();
+  items.forEach(function(item){
+    var key = rnPathKey(item.targetPath);
+    targetCounts.set(key, (targetCounts.get(key) || 0) + 1);
   });
+  items.forEach(function(item){
+    var key = rnPathKey(item.targetPath);
+    var existing = pathIndex.get(key);
+    item.conflict = targetCounts.get(key) > 1
+      || !!(existing && rnPathKey(existing.path) !== rnPathKey(item.path));
+  });
+  rnPreviewItems = items;
+  rnRenderRenamePreview(items);
+  rnUpdateRenameActionState();
+}
+function rnRenderRenamePreview(items){
+  var filter = $('rnPreviewFilter').value;
+  var filtered = filter === 'conflict'
+    ? items.filter(function(item){ return item.conflict; })
+    : items;
+  var pageCount = Math.max(1, Math.ceil(filtered.length / rnPreviewPageSize));
+  if (rnPreviewPage > pageCount) rnPreviewPage = pageCount;
+  var start = (rnPreviewPage - 1) * rnPreviewPageSize;
+  var shown = filtered.slice(start, start + rnPreviewPageSize);
   var html = '';
-  var shown = items.slice(0, 12);
   shown.forEach(function(it){
-    html += '<div class="row-item" style="' + (it.conflict ? 'color:#dc2626' : '') + '">' +
-      escapeHtml(it.path.substring(it.path.lastIndexOf('\\')+1)) + ' \u2192 ' + escapeHtml(it.newName) +
+    html += '<div class="row-item' + (it.conflict ? ' rn-conflict-row' : '') + '">' +
+      escapeHtml(it.oldBase + it.ext) + ' \u2192 ' + escapeHtml(it.newName) +
       (it.conflict ? '（重名）' : '') + '</div>';
   });
-  if (items.length > 12) html += '<div class="row-item" style="color:#94a3b8">\u2026 等共 ' + items.length + ' 项</div>';
+  if (!shown.length) html = '<div class="rn-empty">没有符合条件的预览项。</div>';
   $('rnPreview').innerHTML = html;
+  var conflicts = items.filter(function(item){ return item.conflict; }).length;
   $('rnConflictCount').textContent = conflicts
     ? ('有 ' + conflicts + ' 项目标重名，执行时将被跳过')
     : ('将重命名 ' + items.length + ' 个文件');
+  $('rnPreviewMeta').textContent = '共 ' + filtered.length.toLocaleString()
+    + ' 条，目标重名 ' + conflicts.toLocaleString() + ' 条';
+  $('rnPreviewPageInfo').textContent = '第 ' + rnPreviewPage + ' / ' + pageCount + ' 页';
+  $('btnRnPreviewPrev').disabled = rnPreviewPage <= 1;
+  $('btnRnPreviewNext').disabled = rnPreviewPage >= pageCount;
 }
+$('rnPreviewFilter').addEventListener('change', function(){ rnPreviewPage = 1; rnComputeRenamePreview(); });
+$('btnRnPreviewPrev').addEventListener('click', function(){ rnPreviewPage = Math.max(1, rnPreviewPage - 1); rnRenderRenamePreview(rnPreviewItems); });
+$('btnRnPreviewNext').addEventListener('click', function(){ rnPreviewPage++; rnRenderRenamePreview(rnPreviewItems); });
+function updateRenamePreview(){ rnScheduleRenamePreview(false); }
 // ---- 改名记录与撤销（本次运行） ----
 $('btnRenameHistory').addEventListener('click', function(){ rnRenderHistory(); $('modalRenameHistory').classList.add('open'); });
 $('btnHistoryClose').addEventListener('click', function(){ closeModal('modalRenameHistory'); });
@@ -1903,6 +2794,254 @@ $('btnConfirmDelete').addEventListener('click', function(){
   postToHost('file.delete', { files: paths });
 });
 
+// ---- 批量解压 ----
+var ARCHIVE_EXTENSIONS = { '.zip':true, '.rar':true, '.7z':true, '.tar':true, '.gz':true, '.tgz':true };
+var extractFiles = [];
+var extractRunning = false;
+var extractDone = false;
+var extractTimer = null;
+var extractResult = null;
+
+function isArchiveFile(file){
+  return !!(file && ARCHIVE_EXTENSIONS[String(file.ext || '').toLowerCase()]);
+}
+
+function archiveOutputFolderName(file){
+  var base = file.name || '';
+  if (String(file.ext || '').toLowerCase() === '.gz' && /\.tar$/i.test(base)){
+    base = base.substring(0, base.length - 4);
+  }
+  return base;
+}
+
+function archiveOutputPath(file){
+  var slash = file.path.lastIndexOf('\\');
+  var dir = slash >= 0 ? file.path.substring(0, slash) : '';
+  if (!dir) return archiveOutputFolderName(file);
+  return joinPath(dir, archiveOutputFolderName(file));
+}
+
+function extractConflictLabel(){
+  var checked = document.querySelector('input[name=extractConflict]:checked');
+  if (!checked) return '自动创建新文件夹';
+  return {
+    rename:'自动创建新文件夹',
+    merge:'合并并覆盖同名文件',
+    skip:'跳过目标文件夹已存在的压缩包'
+  }[checked.value] || '自动创建新文件夹';
+}
+
+function resetExtractModal(){
+  extractRunning = false;
+  extractDone = false;
+  extractResult = null;
+  if (extractTimer){ clearInterval(extractTimer); extractTimer = null; }
+  $('extractIntro').style.display = '';
+  $('extractOptions').style.display = '';
+  $('extractProgress').style.display = 'none';
+  $('extractDoneNote').style.display = 'none';
+  $('extractProgressFill').style.width = '0%';
+  $('extractProgressPct').textContent = '0%';
+  $('btnExtractCancel').textContent = '取消';
+  $('btnExtractCancel').disabled = false;
+  $('btnExtractConfirm').textContent = '开始解压';
+  $('btnExtractConfirm').disabled = false;
+  $('extractHeadCount').textContent = '';
+}
+
+function openExtractModal(){
+  var selected = getSelected();
+  extractFiles = selected.filter(isArchiveFile);
+  if (!extractFiles.length){
+    toast('请先勾选 ZIP、RAR、7Z、TAR、GZ 或 TGZ 压缩文件。', 'warn');
+    return;
+  }
+  resetExtractModal();
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+  $('modalExtract').classList.add('open');
+  $('extractHeadCount').textContent = extractFiles.length.toLocaleString() + ' 个';
+  var ignored = Math.max(0, selected.length - extractFiles.length);
+  $('extractSummary').innerHTML = ignored
+    ? '已勾选 <b>' + selected.length.toLocaleString() + '</b> 项，其中 <b>'
+      + extractFiles.length.toLocaleString() + '</b> 个压缩文件可解压，其余 '
+      + ignored.toLocaleString() + ' 个非压缩文件将忽略。'
+    : '已勾选 <b>' + extractFiles.length.toLocaleString() + '</b> 个受支持的压缩文件。';
+  $('extractPreview').innerHTML = extractFiles.map(function(file){
+    return '<div class="extract-row">'
+      + '<span class="from" title="' + escapeHtml(file.path) + '">' + escapeHtml(file.path) + '</span>'
+      + '<span class="arrow">→</span>'
+      + '<span class="to" title="' + escapeHtml(archiveOutputPath(file)) + '">' + escapeHtml(archiveOutputPath(file)) + '</span>'
+      + '</div>';
+  }).join('');
+}
+
+function closeExtractModal(){
+  if (extractRunning){
+    toast('正在解压，请等待本次操作完成。', 'warn');
+    return;
+  }
+  $('modalExtract').classList.remove('open');
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+}
+
+function showExtractCompletion(succeeded, skipped, failed, cancelled){
+  extractRunning = false;
+  extractDone = true;
+  if (!cancelled){
+    $('extractProgressFill').style.width = '100%';
+    $('extractProgressPct').textContent = '100%';
+    $('extractProgressText').textContent = '全部处理完成';
+  } else {
+    $('extractProgressText').textContent = '已取消解压';
+  }
+  $('extractDoneNote').style.display = '';
+  var summary = cancelled
+    ? '<b>解压已取消：</b>'
+    : '<b>解压完成：</b>';
+  summary += '成功 ' + succeeded.toLocaleString() + ' 个，跳过 ' + skipped.toLocaleString()
+    + ' 个，失败 ' + failed.toLocaleString() + ' 个。';
+  if (!cancelled){
+    summary += '目标冲突策略：' + extractConflictLabel() + '。';
+  }
+  summary += '当前扫描结果仍保持原样，未自动加入解压后的文件。';
+  $('extractDoneNote').innerHTML = summary;
+  $('extractOptions').style.display = 'none';
+  $('btnExtractCancel').textContent = '稍后处理';
+  $('btnExtractCancel').disabled = false;
+  $('btnExtractConfirm').textContent = '前往扫描配置';
+  $('btnExtractConfirm').disabled = false;
+  toast(cancelled ? '已取消解压，扫描结果未自动更新' : '解压完成，扫描结果未自动更新',
+    cancelled || skipped || failed ? 'warn' : 'ok');
+}
+
+function setExtractRunningUI(){
+  extractRunning = true;
+  extractDone = false;
+  $('extractOptions').style.display = 'none';
+  $('extractProgress').style.display = '';
+  $('extractProgressFill').style.width = '0%';
+  $('extractProgressPct').textContent = '0%';
+  $('btnExtractCancel').textContent = '取消解压';
+  $('btnExtractCancel').disabled = false;
+  $('btnExtractConfirm').disabled = true;
+}
+
+function startDemoExtraction(){
+  if (!extractFiles.length || extractRunning) return;
+  setExtractRunningUI();
+  var total = extractFiles.length;
+  var processed = 0;
+  var step = Math.max(1, Math.ceil(total / 20));
+  $('extractProgressText').textContent = '正在解压：' + extractFiles[0].name + extractFiles[0].ext;
+  extractTimer = setInterval(function(){
+    processed = Math.min(total, processed + step);
+    var percent = Math.round(processed / total * 100);
+    var current = extractFiles[Math.min(total - 1, processed)];
+    $('extractProgressFill').style.width = percent + '%';
+    $('extractProgressPct').textContent = percent + '%';
+    $('extractProgressText').textContent = '正在解压：' + current.name + current.ext
+      + '（' + processed.toLocaleString() + ' / ' + total.toLocaleString() + '）';
+    if (processed >= total){
+      clearInterval(extractTimer);
+      extractTimer = null;
+      setTimeout(function(){
+        showExtractCompletion(total, 0, 0, false);
+      }, 220);
+    }
+  }, 120);
+}
+
+function startExtraction(){
+  if (!extractFiles.length || extractRunning) return;
+  if (demoMode){
+    startDemoExtraction();
+    return;
+  }
+
+  setExtractRunningUI();
+  $('extractProgressText').textContent = '正在准备解压…';
+  var conflictInput = document.querySelector('input[name=extractConflict]:checked');
+  postToHost('archive.extract', {
+    files: extractFiles.map(function(file){ return file.path; }),
+    conflict: conflictInput ? conflictInput.value : 'rename'
+  });
+}
+
+function extractHandleProgress(p){
+  if (!p || !extractRunning) return;
+  var percent = Math.max(0, Math.min(100, Number(p.percent) || 0));
+  $('extractProgressFill').style.width = percent + '%';
+  $('extractProgressPct').textContent = Math.floor(percent) + '%';
+  var current = p.currentEntry ? ' · ' + p.currentEntry : '';
+  $('extractProgressText').textContent = '正在解压：'
+    + (p.archivePath || '压缩文件') + current
+    + '（' + (Number(p.archiveIndex) || 0).toLocaleString()
+    + ' / ' + (Number(p.archiveCount) || extractFiles.length).toLocaleString() + '）';
+}
+
+function extractHandleDone(p){
+  p = p || {};
+  extractResult = p;
+  extractRunning = false;
+  if (!p.ok){
+    extractDone = true;
+    $('extractDoneNote').style.display = '';
+    $('extractDoneNote').innerHTML = '<b>解压未完成：</b>' + escapeHtml(p.message || '未知错误');
+    $('extractOptions').style.display = 'none';
+    $('btnExtractCancel').textContent = '稍后处理';
+    $('btnExtractCancel').disabled = false;
+    $('btnExtractConfirm').textContent = '前往扫描配置';
+    $('btnExtractConfirm').disabled = false;
+    toast(p.message || '解压失败', 'err');
+    return;
+  }
+  var items = p.items || [];
+  var invalid = p.invalidItems || [];
+  var failed = items.filter(function(item){ return item && !item.succeeded && !item.skipped; })
+    .concat(invalid);
+  showExtractCompletion(
+    Number(p.succeeded) || 0,
+    Number(p.skipped) || 0,
+    failed.length,
+    !!p.cancelled
+  );
+  failed.slice(0, 3).forEach(function(item){
+    toast('解压失败：' + item.path + '（' + item.reason + '）', 'err');
+  });
+}
+
+function goToScanConfiguration(){
+  closeExtractModal();
+  switchTab('scan');
+  setTimeout(function(){
+    $('btnStart').focus();
+    toast('已前往扫描配置。需要查看解压后文件时，请手动重新扫描。', 'ok');
+  }, 60);
+}
+
+$('btnExtract').addEventListener('click', openExtractModal);
+$('btnExtractClose').addEventListener('click', closeExtractModal);
+$('btnExtractCancel').addEventListener('click', function(){
+  if (!extractRunning){
+    closeExtractModal();
+    return;
+  }
+  $('btnExtractCancel').disabled = true;
+  $('btnExtractCancel').textContent = '正在取消…';
+  if (demoMode){
+    if (extractTimer){ clearInterval(extractTimer); extractTimer = null; }
+    showExtractCompletion(0, 0, 0, true);
+    return;
+  }
+  postToHost('archive.cancel');
+});
+$('btnExtractConfirm').addEventListener('click', function(){
+  if (extractDone){ goToScanConfiguration(); return; }
+  startExtraction();
+});
+
 // ---- 操作结果 ----
 function handleOperationDone(p){
   if (!p) return;
@@ -1964,12 +3103,14 @@ function rebuildIndex(){
 /* ================= TXT 查重 ================= */
 var dupGroups = [];
 var dupSkippedFiles = [];
+var dupSkippedGroups = [];
 var dupSkipped = 0;
 var dupPage = 1;
 var dupPageSize = 20;
 var dupSearchText = '';
-var dupCollapsed = false;
 var dupScanning = false;
+var dupGroupLimit = 200;
+var dupReachedGroupLimit = false;
 var dupDemoStartTimer = null;
 var dupDemoProgressTimer = null;
 
@@ -1991,6 +3132,22 @@ function dupFormatTime(value){
   });
 }
 
+function dupReadMaxGroups(){
+  var raw = $('dupMaxGroups').value.trim();
+  if (!/^[1-9]\d*$/.test(raw)){
+    toast('最多重复组数必须填写正整数。', 'err');
+    $('dupMaxGroups').focus();
+    return null;
+  }
+  var value = Number(raw);
+  if (!Number.isSafeInteger(value) || value > 2147483647){
+    toast('最多重复组数超出允许范围。', 'err');
+    $('dupMaxGroups').focus();
+    return null;
+  }
+  return value;
+}
+
 function dupSetPhase(index){
   for (var i=0; i<3; i++){
     var el = $('dupPhase' + i);
@@ -2005,6 +3162,7 @@ function dupSetBusy(busy){
   $('dupTxtFolder').disabled = busy;
   $('dupChkHidden').disabled = busy;
   $('dupChkEmpty').disabled = busy;
+  $('dupMaxGroups').disabled = busy;
   $('btnDupCancel').style.display = busy ? 'inline-block' : 'none';
   if (busy){
     $('tabDupResult').disabled = true;
@@ -2019,6 +3177,9 @@ function dupSetResultReady(){
 }
 
 function dupMapResult(payload){
+  dupSkippedGroups = [];
+  dupGroupLimit = Number(payload && payload.groupLimit) || dupGroupLimit;
+  dupReachedGroupLimit = !!(payload && payload.reachedGroupLimit);
   var groups = ((payload && payload.groups) || []).map(function(group){
     return {
       hash: group.contentHash || group.hash || '',
@@ -2031,7 +3192,8 @@ function dupMapResult(payload){
           checked: false
         };
       }),
-      keep: 0
+      keep: 0,
+      collapsed: false
     };
   });
   var skipped = ((payload && payload.skippedItems) || []).map(function(item){
@@ -2048,6 +3210,7 @@ function dupMapResult(payload){
   dupSearchText = '';
   $('dupTxtSearch').value = '';
   dupRenderGroups();
+  dupUpdateSkippedExportButton();
 }
 
 function dupRenderAll(){
@@ -2118,6 +3281,12 @@ function dupUpdateSelection(){
   $('btnDupDelete').disabled = selected.length === 0;
 }
 
+function dupUpdateSkippedExportButton(){
+  var count = dupSkippedGroups.length;
+  $('btnDupExportSkipped').disabled = count === 0;
+  $('btnDupExportSkipped').textContent = '导出已跳过 (' + count.toLocaleString() + ')';
+}
+
 function dupRenderPagination(filtered){
   var count = dupPageCount(filtered);
   dupClampPage();
@@ -2137,6 +3306,11 @@ function dupRenderPagination(filtered){
   $('dupFtFiles').textContent = cleanFiles.toLocaleString();
 }
 
+function dupUpdateExpandButton(){
+  var allCollapsed = dupGroups.length > 0 && dupGroups.every(function(group){ return group.collapsed; });
+  $('btnDupExpand').textContent = allCollapsed ? '全部展开' : '全部收起';
+}
+
 function dupRenderGroups(){
   var filtered = dupFilteredGroups();
   dupClampPage();
@@ -2149,12 +3323,13 @@ function dupRenderGroups(){
   pageGroups.forEach(function(group){
     var groupIndex = dupGroups.indexOf(group);
     var card = document.createElement('div');
-    card.className = 'dup-group' + (dupCollapsed ? ' collapsed' : '');
-    var html = '<div class="dup-group-hd" data-dup-action="toggle">' +
+    card.className = 'dup-group' + (group.collapsed ? ' collapsed' : '');
+    var html = '<div class="dup-group-hd" data-dup-action="toggle" data-g="' + groupIndex + '">' +
       '<span class="dup-chev">▼</span>' +
       '<span class="dup-group-title">重复组 ' + (groupIndex + 1).toLocaleString() + '</span>' +
       '<span class="dup-hash">SHA-256 ' + escapeHtml(group.hash.substring(0, 12)) + '…</span>' +
       '<span class="dup-group-meta">' + group.files.length + ' 个相同文件 · 可回收 <b>' + dupFormatSize(dupGroupReclaim(group)) + '</b></span>' +
+      '<button class="dup-skip-group" type="button" data-dup-action="skip" data-g="' + groupIndex + '" title="本次查重期间跳过这一组">跳过</button>' +
       '</div><div class="dup-group-bd"><div class="dup-file-head"><span>保留</span><span>清理</span><span>文件位置</span><span>修改时间</span><span style="text-align:right">大小</span></div>';
     group.files.forEach(function(file, fileIndex){
       var isKeep = fileIndex === group.keep;
@@ -2172,6 +3347,8 @@ function dupRenderGroups(){
   dupUpdateMetrics();
   dupRenderPagination(filtered);
   dupUpdateSelection();
+  dupUpdateExpandButton();
+  dupUpdateSkippedExportButton();
 }
 
 function dupRenderSkipped(){
@@ -2207,16 +3384,27 @@ function dupHandleProgress(progress){
 
 function dupHandleDone(payload){
   payload = payload || {};
+  var groupCount = (payload.groups || []).length;
   dupSetResultReady();
   $('dupProgFill').style.width = '100%';
   $('dupProgPct').textContent = '100%';
-  $('dupScanStatus').textContent = '查重完成';
+  $('dupScanStatus').textContent = payload.reachedGroupLimit
+    ? '已达到最多 ' + (Number(payload.groupLimit) || 0).toLocaleString() + ' 组上限，查重已停止'
+    : '查重完成';
   $('dupFileCount').textContent = '已发现 ' + (Number(payload.fileCount) || 0).toLocaleString() + ' 个 TXT 文件';
-  $('dupCandidateCount').textContent = '比对 ' + (Number(payload.candidateCount) || 0).toLocaleString() + ' 个候选';
-  $('dupFoundGroups').textContent = '发现 ' + ((payload.groups || []).length).toLocaleString() + ' 组重复';
+  $('dupCandidateCount').textContent = '比对 ' + (Number(payload.processedCandidateCount) || 0).toLocaleString()
+    + ' / ' + (Number(payload.candidateCount) || 0).toLocaleString() + ' 个候选';
+  $('dupFoundGroups').textContent = payload.reachedGroupLimit
+    ? '达到上限，共 ' + groupCount.toLocaleString() + ' 组'
+    : '发现 ' + groupCount.toLocaleString() + ' 组重复';
   dupMapResult(payload);
   switchTab('dupResult');
-  toast('TXT 查重完成，共发现 ' + dupGroups.length.toLocaleString() + ' 组重复文件', 'ok');
+  toast(
+    payload.reachedGroupLimit
+      ? '已达到重复组上限，提前返回 ' + groupCount.toLocaleString() + ' 组结果'
+      : 'TXT 查重完成，共发现 ' + groupCount.toLocaleString() + ' 组重复文件',
+    payload.reachedGroupLimit ? 'warn' : 'ok'
+  );
 }
 
 function dupHandleError(payload){
@@ -2243,7 +3431,11 @@ function dupStartScan(){
     folder = $('dupTxtFolder').value.trim();
   }
   if (!folder){ toast('请选择有效的目标文件夹。', 'err'); return; }
+  var maxGroups = dupReadMaxGroups();
+  if (maxGroups === null) return;
 
+  dupGroupLimit = maxGroups;
+  dupReachedGroupLimit = false;
   $('dupProgFill').style.width = '0%';
   $('dupProgPct').textContent = '0%';
   $('dupScanStatus').textContent = '正在准备查重…';
@@ -2253,11 +3445,12 @@ function dupStartScan(){
   dupSetPhase(0);
   dupSetBusy(true);
 
-  if (demoMode){ dupStartDemoScan(); return; }
+  if (demoMode){ dupStartDemoScan(maxGroups); return; }
   postToHost('duplicate.scan.start', {
     folder: folder,
     includeHidden: $('dupChkHidden').checked,
-    ignoreEmpty: $('dupChkEmpty').checked
+    ignoreEmpty: $('dupChkEmpty').checked,
+    maxGroups: maxGroups
   });
 }
 
@@ -2272,7 +3465,7 @@ function dupCancelScan(){
   postToHost('duplicate.scan.cancel');
 }
 
-function dupStartDemoScan(){
+function dupStartDemoScan(maxGroups){
   dupDemoStartTimer = setTimeout(function(){
     var pct = 0;
     dupDemoProgressTimer = setInterval(function(){
@@ -2283,12 +3476,12 @@ function dupStartDemoScan(){
         currentFile: pct < 30 ? 'D:\\演示目录\\历史资料\\会议纪要.txt' : '正在计算 SHA-256：项目周报.txt',
         fileCount: Math.floor(12486 * Math.min(1, pct / 28)),
         candidateCount: pct < 28 ? 0 : Math.floor(6218 * Math.min(1, (pct - 28) / 35)),
-        groupCount: pct < 68 ? 0 : Math.floor(5000 * Math.min(1, (pct - 68) / 32))
+        groupCount: pct < 68 ? 0 : Math.min(maxGroups, Math.floor(maxGroups * Math.min(1, (pct - 68) / 32)))
       });
       if (pct >= 100){
         clearInterval(dupDemoProgressTimer);
         dupDemoProgressTimer = null;
-        setTimeout(dupFinishDemoScan, 300);
+        setTimeout(function(){ dupFinishDemoScan(maxGroups); }, 300);
       }
     }, 70);
   }, 600);
@@ -2314,7 +3507,8 @@ function dupBuildDemoGroups(){
     result.push({
       hash: ((i * 2654435761) >>> 0).toString(16).padStart(8, '0') + ((i * 2246822519) >>> 0).toString(16).padStart(8, '0'),
       files: files,
-      keep: 0
+      keep: 0,
+      collapsed: false
     });
   }
   return result.sort(function(a, b){ return dupGroupReclaim(b) - dupGroupReclaim(a); });
@@ -2331,15 +3525,24 @@ function dupBuildDemoSkipped(){
   });
 }
 
-function dupFinishDemoScan(){
+function dupFinishDemoScan(maxGroups){
+  var allGroups = dupBuildDemoGroups();
+  var reachedLimit = allGroups.length > maxGroups;
+  dupGroupLimit = maxGroups;
+  dupReachedGroupLimit = reachedLimit;
   dupSetResultReady();
   $('dupProgFill').style.width = '100%';
   $('dupProgPct').textContent = '100%';
-  $('dupScanStatus').textContent = '查重完成';
+  $('dupScanStatus').textContent = reachedLimit
+    ? '已达到最多 ' + maxGroups.toLocaleString() + ' 组上限，查重已停止'
+    : '查重完成';
   $('dupFileCount').textContent = '已发现 12,486 个 TXT 文件';
-  $('dupCandidateCount').textContent = '比对 6,218 个大小相同的候选';
-  $('dupFoundGroups').textContent = '发现 5,000 组重复';
-  dupGroups = dupBuildDemoGroups();
+  $('dupCandidateCount').textContent = '比对 ' + (reachedLimit ? '部分候选' : '6,218 个大小相同的候选');
+  $('dupFoundGroups').textContent = reachedLimit
+    ? '达到上限，共 ' + maxGroups.toLocaleString() + ' 组'
+    : '发现 ' + allGroups.length.toLocaleString() + ' 组重复';
+  dupGroups = allGroups.slice(0, maxGroups);
+  dupSkippedGroups = [];
   dupSkippedFiles = dupBuildDemoSkipped();
   dupSkipped = dupSkippedFiles.length;
   dupPage = 1;
@@ -2347,7 +3550,12 @@ function dupFinishDemoScan(){
   $('dupTxtSearch').value = '';
   dupRenderGroups();
   switchTab('dupResult');
-  toast('TXT 查重完成，共发现 5,000 组重复文件', 'ok');
+  toast(
+    reachedLimit
+      ? '已达到重复组上限，提前返回 ' + maxGroups.toLocaleString() + ' 组结果'
+      : 'TXT 查重完成，共发现 ' + allGroups.length.toLocaleString() + ' 组重复文件',
+    reachedLimit ? 'warn' : 'ok'
+  );
 }
 
 function dupSetPage(page){
@@ -2362,7 +3570,7 @@ function dupRemoveDeletedPaths(paths){
     var keepPath = group.files[group.keep] ? group.files[group.keep].path : '';
     var files = group.files.filter(function(file){ return !deletedSet.has(file.path); });
     var keep = files.findIndex(function(file){ return file.path === keepPath; });
-    return { hash:group.hash, files:files, keep:keep >= 0 ? keep : 0 };
+    return { hash:group.hash, files:files, keep:keep >= 0 ? keep : 0, collapsed:!!group.collapsed };
   }).filter(function(group){ return group.files.length > 1; });
   dupRenderAll();
 }
@@ -2380,6 +3588,16 @@ function dupHandleDeleteDone(payload){
   });
 }
 
+function dupHandleSkippedExportDone(payload){
+  payload = payload || {};
+  if (payload.ok){
+    toast('已导出 ' + (Number(payload.groupCount) || 0).toLocaleString() + ' 组、'
+      + (Number(payload.fileCount) || 0).toLocaleString() + ' 个文件：' + payload.path, 'ok');
+    return;
+  }
+  toast(payload.message || '导出已跳过重复组失败。', payload.cancelled ? 'warn' : 'err');
+}
+
 $('btnDupBrowse').addEventListener('click', function(){
   browseFolder(function(path){ if (path) $('dupTxtFolder').value = path; });
 });
@@ -2391,8 +3609,9 @@ $('dupTxtSearch').addEventListener('input', function(){
   dupRenderGroups();
 });
 $('btnDupExpand').addEventListener('click', function(){
-  dupCollapsed = !dupCollapsed;
-  this.textContent = dupCollapsed ? '全部展开' : '全部收起';
+  var anyExpanded = dupGroups.some(function(group){ return !group.collapsed; });
+  dupGroups.forEach(function(group){ group.collapsed = anyExpanded; });
+  this.textContent = anyExpanded ? '全部展开' : '全部收起';
   dupRenderGroups();
 });
 $('btnDupRecommend').addEventListener('click', function(){
@@ -2408,6 +3627,22 @@ $('btnDupClearSelection').addEventListener('click', function(){
   dupGroups.forEach(function(group){ group.files.forEach(function(file){ file.checked = false; }); });
   dupRenderGroups();
   toast('已清空全部查重选择', 'ok');
+});
+$('btnDupExportSkipped').addEventListener('click', function(){
+  if (!dupSkippedGroups.length){
+    toast('当前没有已跳过的重复组。', 'warn');
+    return;
+  }
+  if (demoMode){
+    toast('浏览器预览模式不生成真实文件，请在桌面程序中导出。', 'warn');
+    return;
+  }
+  postToHost('duplicate.skipped.export', { groups:dupSkippedGroups });
+});
+$('dupMaxGroups').addEventListener('input', function(){
+  var digits = this.value.replace(/\D/g, '');
+  digits = digits.replace(/^0+(?=\d)/, '');
+  this.value = digits;
 });
 $('btnDupSkipped').addEventListener('click', function(){
   dupRenderSkipped();
@@ -2425,7 +3660,29 @@ $('dupGroupList').addEventListener('click', function(e){
   if (!target) return;
   var action = target.dataset.dupAction;
   if (action === 'toggle'){
-    target.closest('.dup-group').classList.toggle('collapsed');
+    var toggleIndex = Number(target.dataset.g);
+    var toggleGroup = dupGroups[toggleIndex];
+    if (!toggleGroup) return;
+    toggleGroup.collapsed = !toggleGroup.collapsed;
+    target.closest('.dup-group').classList.toggle('collapsed', toggleGroup.collapsed);
+    dupUpdateExpandButton();
+    return;
+  }
+  if (action === 'skip'){
+    var skipIndex = Number(target.dataset.g);
+    var skippedGroup = dupGroups[skipIndex];
+    if (!skippedGroup) return;
+    dupSkippedGroups.push({
+      order: dupSkippedGroups.length + 1,
+      contentHash: skippedGroup.hash,
+      files: skippedGroup.files.map(function(file){
+        return { name:file.name, fullPath:file.path, size:file.size };
+      })
+    });
+    dupGroups.splice(skipIndex, 1);
+    dupClampPage();
+    dupRenderGroups();
+    toast('已跳过该重复组，本次查重期间不再显示。', 'ok');
     return;
   }
   var groupIndex = Number(target.dataset.g);
@@ -2496,7 +3753,9 @@ $('txtFileName').value = defaultExportName();
 renderFmt();
 renderTiers();
 renderTree();
+rnRenderModeMenu();
 applyFilters();
-</script></script>
+emptyFolderRefreshBadge();
+</script>
 </body>
 </html>

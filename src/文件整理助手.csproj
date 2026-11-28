@@ -11,14 +11,15 @@
     <RootNamespace>文件整理助手</RootNamespace>
     <AssemblyName>文件整理助手</AssemblyName>
     <AssemblyTitle>文件整理助手</AssemblyTitle>
-    <Version>2.1.2</Version>
-    <FileVersion>2.1.2.0</FileVersion>
+    <Version>2.2.0</Version>
+    <FileVersion>2.2.0.0</FileVersion>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.104.2" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+    <PackageReference Include="SharpCompress" Version="0.38.0" />
   </ItemGroup>
 
   <ItemGroup>

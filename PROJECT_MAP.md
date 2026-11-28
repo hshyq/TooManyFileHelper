@@ -14,30 +14,39 @@
 |   +-- MainForm.cs                   # 主窗体：WebView2 宿主 + JS↔C# 桥接
 |   +-- MainForm.Designer.cs          # 主窗体设计器代码（WebView2 控件）
 |   +-- BridgeService.cs              # 新增：消息协议分发、参数校验、后端调度
-|   +-- FileScanner.cs                # 文件递归遍历核心逻辑（复用 v1.2）
-|   +-- FileOperations.cs             # 新增：批量移动 / 改名 / 删除（回收站）
+|   +-- FileScanner.cs                # 文件递归遍历 + 无文件文件夹审计
+|   +-- FileOperations.cs             # 批量移动 / 改名 / 文件与空文件夹删除
+|   +-- FolderSafety.cs               # 删除前空目录复核与扫描范围校验
+|   +-- FolderCleanupBridgeService.cs # 无文件文件夹删除消息桥接
+|   +-- ArchiveExtractor.cs           # ZIP/RAR/7Z/TAR/GZ/TGZ 批量解压引擎
+|   +-- ArchiveBridgeService.cs       # 解压消息、进度、取消桥接
+|   +-- ArchiveModels.cs              # 解压进度与结果模型
 |   +-- ExcelExporter.cs              # 使用 ClosedXML 生成 .xlsx（可选导出）
-|   +-- FileEntry.cs                  # 数据模型：FileEntry / ScanPhase / ScanProgress
+|   +-- FileEntry.cs                  # 数据模型：FileEntry / FolderEntry / ScanResult / 进度
 |   +-- DuplicateBridgeService.cs     # TXT 查重消息、进度、取消、删除保护
 |   +-- DuplicateScanner.cs           # TXT 枚举、大小预筛、SHA-256 分组
 |   +-- DuplicateModels.cs            # 查重结果、进度和失败项模型
+|   +-- DuplicateSkippedExporter.cs   # 跳过重复组 XLSX 导出
 |   +-- FileContentHasher.cs          # 流式 SHA-256
 |   +-- Assets/logo.svg               # 应用 Logo 矢量源文件
 |   +-- Assets/app.ico                # 应用图标（16–256 多尺寸，exe/窗口/任务栏）
 |   +-- ui/index.html                 # WebView2 加载的 UI 资源（嵌入式，四个标签页）
-|   +-- 文件整理助手.csproj            # 项目文件（.NET 8 + WinForms + WebView2 + ClosedXML）
+|   +-- 文件整理助手.csproj            # 项目文件（.NET 8 + WinForms + WebView2 + ClosedXML + SharpCompress）
 |
-+-- tests/                            # 无第三方依赖的冒烟测试
++-- tests/                            # 扫描、查重、文件夹安全和解压冒烟测试
 |   +-- DuplicateScannerSmoke/        # TXT 查重与桥接保护测试
+|   +-- FolderAuditSmoke/             # 无文件文件夹审计与安全删除测试
+|   +-- ArchiveExtractorSmoke/        # 解压引擎与桥接测试
+|   +-- BridgeIntegrationSmoke/       # 主桥接扫描、文件夹删除和解压集成测试
 |
 +-- doc/                              # 项目文档（PRD、技术方案、项目概述）
-|   +-- PRD.md                        # 产品需求文档 v2.1.2
-|   +-- 技术方案文档.md                # 技术方案文档 v2.1.2
+|   +-- PRD.md                        # 产品需求文档 v2.2.0
+|   +-- 技术方案文档.md                # 技术方案文档 v2.2.0
 |   +-- 项目概述.md                    # 项目速览
 |
 +-- history/                          # 历史版本源码存档（仅供追溯，不入库）
 |
-+-- publish/                          # v2.1.2 exe / zip 发布产物（不入库，经 GitHub Releases 分发）
++-- publish/                          # v2.2.0 exe / zip 发布产物（不入库，经 GitHub Releases 分发）
 |
 +-- AGENTS.md                         # AI 协作规范（最高优先级）
 +-- README.md                         # 人类说明书（中英双语）
@@ -76,25 +85,55 @@
 | 项目 | 说明 |
 |------|------|
 | 职责 | JS ↔ C# 消息协议：指令分发、参数校验、后端调度、事件回传 |
-| 协议 | browse.folder / scan.start / scan.progress（100ms 节流）/ scan.done / export.start / export.overwrite / export.overwrite.answer / export.result / explorer.select / file.move / file.rename / file.delete / duplicate.scan.start / duplicate.scan.progress / duplicate.scan.done / duplicate.scan.cancel / duplicate.scan.cancelled / duplicate.scan.error / duplicate.delete / duplicate.delete.done / operation.done / toast / error |
+| 协议 | browse.folder / scan.start / scan.progress / scan.done / export.start / export.overwrite / export.overwrite.answer / export.result / explorer.select / file.move / file.rename / file.delete / folder.delete / folder.delete.done / archive.extract / archive.progress / archive.cancel / archive.done / duplicate.* / operation.done / toast / error |
 | 序列化 | System.Text.Json，camelCase |
-| 行为 | 扫描结果缓存在 `_lastResult`；导出前同名文件先请求前端确认（HTML 模态）；进度节流推送 |
+| 行为 | 扫描结果缓存在 `_lastResult`，扫描根缓存在 `_scanRoot`；文件夹删除和解压委托独立桥接服务；导出前同名文件先请求前端确认 |
+
+### FolderCleanupBridgeService.cs
+
+| 项目 | 说明 |
+|------|------|
+| 职责 | 无文件文件夹删除桥接 |
+| 要点 | 只接受扫描根内路径；调用 `FolderSafety` 删除前复核；返回已删除/跳过/失败项 |
+| 行为 | `DeleteAsync` |
+
+### FolderSafety.cs
+
+| 项目 | 说明 |
+|------|------|
+| 职责 | 空目录删除前的独立安全检查 |
+| 要点 | 始终统计隐藏与系统文件；无权限或重解析点返回 `Unknown`；提供扫描根范围判断 |
+
+### ArchiveBridgeService.cs
+
+| 项目 | 说明 |
+|------|------|
+| 职责 | 批量解压消息桥接 |
+| 要点 | 校验扫描范围、解析冲突策略、100ms 进度节流、取消；解压完成不回写扫描结果 |
+| 行为 | `StartAsync` / `Cancel` |
+
+### ArchiveExtractor.cs
+
+| 项目 | 说明 |
+|------|------|
+| 职责 | 独立批量解压引擎 |
+| 要点 | SharpCompress 处理 ZIP/RAR/7Z；内置 TarReader/GZipStream 处理 TAR/GZ/TGZ；支持 Rename/Merge/Skip、取消和路径穿越防护 |
 
 ### FileScanner.cs
 
 | 项目 | 说明 |
 |------|------|
-| 职责 | 文件递归遍历核心逻辑，独立类、可测试 |
-| 要点 | 两遍扫描；`includeHidden` 控制隐藏文件；ReparsePoint 跳过；权限不足报告 `SkippedPath` |
-| 排序 | 扫描完成后按 `FullPath` 不区分大小写升序排序 |
+| 职责 | 文件递归遍历和无文件文件夹审计，独立类、可测试 |
+| 要点 | 两遍扫描；隐藏开关只控制文件结果，空目录审计始终统计隐藏/系统文件；无权限与 ReparsePoint 不列入候选 |
+| 输出 | `ScanResult { Files, EmptyFolders }`；按 `FullPath` 不区分大小写升序排序 |
 
 ### FileOperations.cs
 
 | 项目 | 说明 |
 |------|------|
-| 职责 | 批量移动 / 批量改名 / 批量删除（回收站）独立类 |
-| 要点 | 删除走 `Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(..., RecycleOption.SendToRecycleBin)`；移动冲突策略 Skip/Overwrite/Rename；改名校验非法字符与重名；逐项 try-catch 汇总 `OperationResult` |
-| 行为 | `MoveFilesAsync` / `RenameFilesAsync` / `DeleteFilesAsync`，内部经 `Task.Run` 执行 |
+| 职责 | 批量移动 / 改名 / 文件删除 / 无文件文件夹删除 |
+| 要点 | 文件与文件夹均移入回收站；文件夹父子路径先折叠；删除前调用安全复核；逐项汇总结果 |
+| 行为 | `MoveFilesAsync` / `RenameFilesAsync` / `DeleteFilesAsync` / `DeleteEmptyFoldersAsync` |
 
 ### DuplicateBridgeService.cs
 
@@ -126,6 +165,13 @@
 | 职责 | 查重文件、重复组、失败项、阶段、进度和结果模型 |
 | 内容 | `DuplicateFileEntry` / `DuplicateGroup` / `DuplicateSkippedItem` / `DuplicateScanProgress` / `DuplicateScanResult` |
 
+### DuplicateSkippedExporter.cs
+
+| 项目 | 说明 |
+|------|------|
+| 职责 | 将本次查重中跳过的重复组导出为 XLSX |
+| 要点 | 使用 ClosedXML；列为跳过序号、文件名、所在文件夹完整路径、文件大小（字节）；后台任务执行，不阻塞 UI |
+
 ### ExcelExporter.cs
 
 | 项目 | 说明 |
@@ -139,7 +185,7 @@
 | 项目 | 说明 |
 |------|------|
 | 职责 | 数据模型与扫描进度类型定义 |
-| 内容 | `FileEntry`（Name / Extension / FullPath / Size）、`ScanPhase` 枚举、`ScanProgress` record |
+| 内容 | `FileEntry`、`FolderEntry`、`ScanResult`、`ScanPhase`、`ScanProgress` |
 
 ### src/ui/index.html
 
@@ -147,16 +193,16 @@
 |------|------|
 | 职责 | WebView2 加载的 UI 页面：四个标签页（扫描配置 / 扫描结果 / TXT 查重 / 查重结果），原生 HTML/CSS/JS |
 | 通信 | 检测 `window.chrome.webview` 存在时走 postMessage 与 C# 通信；浏览器直开（无 WebView2）时为演示模式（随机演示数据 + 模拟交互） |
-| 组件 | 原扫描虚拟表格与批量操作；TXT 查重三阶段进度与取消；重复组分页（20/50/100）；搜索、跨页选择、保留项、失败明细穿透、回收站确认 |
-| 要点 | 查重不比较名称和目录；每组至少保留 1 份；失败明细弹层仅内部列表滚动；原扫描与批量操作保持不变 |
+| 组件 | 扫描虚拟表格；无文件文件夹树；批量解压；批量改名；TXT 查重；查重结果底部常驻清理栏 |
+| 要点 | 扫描结果页窗口内固定，仅数据列表滚动；文件夹候选父子级联；混合勾选只解压压缩包；解压完成不自动刷新 |
 
 ### 文件整理助手.csproj
 
 | 项目 | 说明 |
 |------|------|
 | 配置 | `net8.0-windows` + `UseWindowsForms` + `ImplicitUsings` + `Nullable` + `ApplicationHighDpiMode=PerMonitorV2` + `LongPathAware` |
-| 版本 | `2.1.2` |
-| 依赖 | `ClosedXML` 0.104.2、`Microsoft.Web.WebView2` 1.0.2903.40（Evergreen） |
+| 版本 | `2.2.0` |
+| 依赖 | `ClosedXML` 0.104.2、`Microsoft.Web.WebView2` 1.0.2903.40（Evergreen）、`SharpCompress` 0.38.0 |
 | 资源 | `ui/index.html` 为嵌入式资源（资源名 `文件整理助手.ui.index.html`） |
 | 发布清理 | `RemoveUnneededWebView2Documentation` 在 Publish 后删除 `Microsoft.Web.WebView2.*.xml` |
 | 命名 | `RootNamespace` 与 `AssemblyName` 均为「文件整理助手」 |
@@ -168,11 +214,13 @@
 
 ```
 src/ui/index.html（HTML/JS 界面）
-   │  postMessage（JSON 指令：scan.start / file.move / file.rename / file.delete / duplicate.scan.start / duplicate.delete …）
+   │  postMessage（scan.start / file.* / folder.delete / archive.* / duplicate.*）
    ▼
 BridgeService（指令分发 + 参数校验 + 调度）
    │
-   ├──► FileScanner ──► List<FileEntry>（scan.done 全量结果回传前端）
+   ├──► FileScanner ──► ScanResult { Files, EmptyFolders }（scan.done 全量回传）
+   ├──► FolderCleanupBridgeService ──► FolderSafety / FileOperations（复核后回收站删除）
+   ├──► ArchiveBridgeService ──► ArchiveExtractor（逐包解压、进度、取消）
    ├──► DuplicateBridgeService
    │      ├──► DuplicateScanner ──► FileContentHasher
    │      └──► FileOperations（保留项校验后移入回收站）
@@ -188,9 +236,13 @@ BridgeService（指令分发 + 参数校验 + 调度）
 - 跨线程 UI 更新：后台线程不直接操作控件，经 WebView2 消息通道推送；回传统一走 UI 线程（`BeginInvoke`）。
 - 耗时任务（扫描、导出、批量操作）使用 `Task.Run` 隔离。
 - 扫描进度消息 100ms 节流；扫描期间「扫描结果」标签置灰，完成后一次性推送全量结果。
+- 扫描结果页使用 `result-layout` 窗口内弹性布局，筛选/操作区、表头和底部统计固定，仅 `.vlist` 数据区滚动。
 - 查重进度消息 100ms 节流；查重期间「查重结果」置灰；失败/跳过明细随结果返回。
 - TXT 查重只认可逐字节完全相同；读取过程中文件大小或写入时间变化时标记失败，不进入重复组。
 - 查重删除同时校验保留项和整组全选；所有删除仍走回收站。
+- 无文件文件夹判断与扫描结果隐藏开关解耦；隐藏/系统文件始终阻止目录进入删除候选。
+- 解压只处理本次扫描范围内、扩展名受支持的压缩包；所有包内路径必须落在目标文件夹内。
+- 解压完成不自动更新扫描结果，用户可主动前往扫描配置重新扫描。
 - HTML/JS 不直接访问文件系统，所有文件操作由 C# 后端执行。
 - 删除操作默认移入回收站，执行前二次确认。
 - 新增模块时按上述模板补充「职责 / 要点 / 行为」三列，并同步更新目录树与数据流。

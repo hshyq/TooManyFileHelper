@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpCompress" Version="0.38.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\ArchiveExtractor.cs" Link="ArchiveExtractor.cs" />
+    <Compile Include="..\..\src\ArchiveModels.cs" Link="ArchiveModels.cs" />
+    <Compile Include="..\..\src\ArchiveBridgeService.cs" Link="ArchiveBridgeService.cs" />
+    <Compile Include="..\..\src\FolderSafety.cs" Link="FolderSafety.cs" />
+  </ItemGroup>
+</Project>
