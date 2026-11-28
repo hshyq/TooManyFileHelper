@@ -94,7 +94,7 @@
 - [x] 产物验证：无 PDB/XML、版本正确、ZIP 单文件位于根目录、启动冒烟通过、运行后不污染 publish 目录
 - [x] 使用用户真实迁移文件夹实测：用户确认测试通过（2026-11-21）
 - [x] GitHub Release v2.1.2 已发布：https://github.com/hshyq/TooManyFileHelper/releases/tag/v2.1.2
-- [ ] 推送 v2.1.7 并上传 GitHub Release（等待用户确认）
+- [x] v2.1.7 功能已并入 v2.2.0 发布
 - [ ] 图片、视频查重在 TXT 已实测通过的基础上单独评估，不与精确查重混用删除逻辑
 
 ## 6. 批量改名性能优化（开发完成）
@@ -110,7 +110,7 @@
 - [x] 批次 4：表头全选、前30/50/100、当前可见范围与清空选择
 - [x] 批次 5：验证5万文件/1万选中；简单改名打开约1ms、预览约21ms、自定义分析约588ms
 - [x] 回归验证：预览100条/页、只看重名、路径冲突2项、模板21个分2页、翻页编辑状态保持设计
-- [ ] 批量改名优化随 v2.1.7 一并推送 GitHub Release（等待用户确认）
+- [x] 批量改名优化已随 v2.2.0 发布
 
 ## 7. 批量移动异常排查
 
@@ -129,7 +129,7 @@
 - 功能改动涉及行为时，同步更新 `doc/PRD.md` 与 `doc/技术方案文档.md` 的版本号与内容。
 - 开发环境运行 Debug 版需设置 `DOTNET_ROOT=C:\Users\mw\.dotnet`（系统缺 WindowsDesktop.App 运行时）；正式发布用自包含（无需运行时）。
 
-## 9. 扫描结果优化 v2.2.0（开发完成，待用户实测，2026-11-28）
+## 9. 扫描结果优化 v2.2.0（已发布，2026-11-28）
 
 - [x] 新建独立原型 `doc/prototype/scan-cleanup-extract-prototype.html`，未改动正式 `src/ui/index.html`
 - [x] 增加“无文件文件夹”入口、树形批量勾选、父文件夹级联删除和二次确认
@@ -151,5 +151,5 @@
 - [ ] RAR 使用真实样本补充一次解压验证（SharpCompress 已接入，当前自动化环境无 RAR 样本）
 - [x] 发布 v2.2.0 自包含单文件与 ZIP：`publish/文件整理助手.exe`、`publish/TooManyFileHelper-v2.2.0-win-x64.zip`
 - [x] 创建本地 v2.2.0 发布提交与标签
-- [ ] 推送 `main` 和 `v2.2.0` 标签到 GitHub（阻塞：当前 HTTPS 代理 `127.0.0.1:10808` 未运行，直连 github.com 超时）
-- [ ] 上传 v2.2.0 GitHub Release 与两个附件（等待 GitHub 可写网络恢复）
+- [x] 推送 `main` 和 `v2.2.0` 标签到 GitHub
+- [x] 上传 v2.2.0 GitHub Release，仅保留 ZIP 附件：https://github.com/hshyq/TooManyFileHelper/releases/tag/v2.2.0
